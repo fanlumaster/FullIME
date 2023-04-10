@@ -1,5 +1,6 @@
 #include "./ime_hook.h"
 
+#include "../sqlite/sqlite_wrapper.h"
 #include "../ui/candUI.h"
 
 // 全局变量，用来捕捉键盘的字符
@@ -13,6 +14,8 @@ std::vector<std::pair<std::string, long>> curCandidateVec;
 int pageNo = 0;
 // 左右引号的标志
 bool quoteFlag = true;
+// 数据库
+sqlite3 *db;
 
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
@@ -44,23 +47,14 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 IMEState = !IMEState;
                 if (IMEStateToast == "中") {
                     IMEStateToast = "英";
+                    candidateVec.clear();
+                    curCandidateVec.clear();
                 } else {
                     IMEStateToast = "中";
                 }
-                // std::cout << IMEStateToast << "\n";
+                // TODO: 展示输入法现在的状态
                 return 1;
             }
-
-            // if (s->vkCode == VK_LSHIFT) {
-            //     IMEState = !IMEState;
-            //     if (IMEStateToast == "中") {
-            //         IMEStateToast = "英";
-            //     } else {
-            //         IMEStateToast = "中";
-            //     }
-            //     std::cout << IMEStateToast << "\n";
-            //     return 1;
-            // }
 
             if (IMEState) {
                 /*
@@ -69,6 +63,58 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 if (s->vkCode == VK_ESCAPE) {
                     charVec.clear();
                     return 1;
+                }
+
+                /*
+                    处理退格键
+                */
+                if (s->vkCode == VK_BACK) {
+                    int curSize = charVec.size();
+                    if (curSize > 0 && curSize <= 3) {
+                        charVec.pop_back();
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        candidateVec = queryPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
+                        }
+                        // charVec.clear();
+                        // 把当前合的候选框给打印出来
+                        printOneDVector(curCandidateVec);
+                        return 1;
+                    } else if (curSize >= 4 && curSize <= 5) {
+                        charVec.pop_back();
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        candidateVec = queryTwoPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
+                        }
+                        // charVec.clear();
+                        // 把当前合的候选框给打印出来
+                        printOneDVector(curCandidateVec);
+                        return 1;
+                    } else if (curSize >= 6) {
+                        charVec.pop_back();
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        candidateVec = queryMultiPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
+                        }
+                        // charVec.clear();
+                        // 把当前合的候选框给打印出来
+                        printOneDVector(curCandidateVec);
+                        return 1;
+                    } else {
+                        break;
+                    }
                 }
 
                 /*
@@ -82,23 +128,44 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         sendStringToCursor(converter.from_bytes(newStr));
                         return 1;
                     }
-
                     charVec.push_back(std::tolower(c));
-
+                    int curSize = charVec.size();
                     // 处理所有符合的字符
-                    if (charVec.size() >= 2) {
+                    if (curSize > 0 && curSize <= 2) {
                         std::string hanKey(charVec.begin(), charVec.end());
-                        // std::cout << hanKey << ": ";
-                        if (sqlPageMap.count(hanKey)) {
-                            auto allHans = sqlPageMap[hanKey];
-                            candidateVec = allHans;
-                            curCandidateVec = allHans[0];
-                            // 把当前合的候选框给打印出来
-                            printOneDVector(curCandidateVec);
+                        candidateVec = queryPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
+                        }
+                        // charVec.clear();
+                    } else if (curSize > 2 && curSize <= 4) {
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        candidateVec = queryTwoPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
+                        }
+                        // charVec.clear();
+                    } else if (curSize > 4) {
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        candidateVec = queryMultiPinyinInPage(db, hanKey);
+                        if (candidateVec.size() > 0) {
+                            curCandidateVec = candidateVec[0];
+                        } else {
+                            candidateVec.clear();
+                            curCandidateVec.clear();
                         }
                         // charVec.clear();
                     }
-
+                    if (charVec.size() > 0) {
+                        // 把当前合的候选框给打印出来
+                        printOneDVector(curCandidateVec);
+                    }
                     return 1;  // 1 表示不向下传递给其他钩子函数
                 }
 

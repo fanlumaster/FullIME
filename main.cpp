@@ -31,6 +31,7 @@
 
 #include "./flypytblsqlite.h"
 #include "./hook/ime_hook.h"
+#include "./sqlite/sqlite_wrapper.h"
 #include "./ui/candUI.h"
 
 #pragma comment(lib, "d2d1.lib")
@@ -41,8 +42,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
     // 初始化小鹤双拼的码表，纯双拼二码
     std::string dbPath = "../../src/flyciku.db";
-    sqlPageMap = transTableToMap(dbPath, 8);  // 如果把这个放到钩子函数里面会导致程序很慢的
-
+    // sqlPageMap = transTableToMap(dbPath, 8);  // 如果把这个放到钩子函数里面会导致程序很慢的
+    db = openSqlite(dbPath);
     // 创建一个窗口的基本操作
     WNDCLASSEX winClass;
 
@@ -59,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     winClass.cbClsExtra = 0;
     winClass.cbWndExtra = 0;
 
-    // 注册窗口，基本上是不会出问题的
+    // 注册窗口
     if (!RegisterClassEx(&winClass)) {
         MessageBox(NULL, TEXT("This program requires Windows NT!"), L"error", MB_ICONERROR);
         return 0;
@@ -106,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         } else if (msg.message == WM_FANY_REDRAW) {
             // wText = L"ni'hc\n1.还行\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
             FanyDrawText(gHwnd, wText);
-            SetWindowPos(gHwnd, NULL, 60, 10, 78, 306, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            SetWindowPos(gHwnd, NULL, 60, 10, 78, 306 + 20, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
         } else {
             TranslateMessage(&msg);
             DispatchMessage(&msg);

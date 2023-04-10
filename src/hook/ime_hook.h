@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../libs/sqlite/sqlite3.h"
+
 /*
     全局变量部分
 */
@@ -23,6 +25,8 @@ extern std::vector<std::pair<std::string, long>> curCandidateVec;
 extern int pageNo;
 // 左右引号的标志
 extern bool quoteFlag;
+// 数据库
+extern sqlite3* db;
 
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
@@ -38,4 +42,4 @@ extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 // 钩子处理函数
 LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam);
 // 模拟按下字符串中的每个字符
-void sendStringToCursor(const std::wstring &str);
+void sendStringToCursor(const std::wstring& str);

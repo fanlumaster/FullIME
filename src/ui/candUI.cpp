@@ -119,9 +119,12 @@ void Cleanup() {
 
 /*
     在候选框中打印当前的候选项
+    不打印拼音
 */
 void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
+    std::string pinyinStr(charVec.begin(), charVec.end());
     wText = L"";
+    wText = wText + converter.from_bytes(pinyinStr + "\n");
     for (int i = 0; i < myVec.size(); i++) {
         // std::cout << i + 1 << "." << myVec[i].first << ' ';
         wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
