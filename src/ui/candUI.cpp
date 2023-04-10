@@ -22,9 +22,9 @@ extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 // 窗口过程
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
-        case WM_PAINT:
-            FanyDrawText(hWnd, wText);
-            break;
+            // case WM_PAINT:
+            // FanyDrawText(hWnd, wText);
+            // break;
 
         case WM_DESTROY:
             Cleanup();
@@ -40,6 +40,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 // 绘制文本
 void FanyDrawText(HWND hwnd, std::wstring wText) {
+    /*
+        我们在重绘的时候，得重新获取一下客户区的信息，以及重新定义一下字体的信息？
+        不然，字体的拉伸会导致字体的质量变得很差。
+    */
+    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn",
+                                       &g_pDWriteTextFormat);
+    // 获取可以绘制的客户区的长方形区域
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+    g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
+                                          D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
+
     // 清除背景为白色
     // pRenderTarget->BeginDraw();
     g_pRenderTarget->BeginDraw();
