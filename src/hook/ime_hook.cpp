@@ -62,11 +62,12 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 */
                 if (s->vkCode == VK_ESCAPE) {
                     charVec.clear();
+                    fanyHideWindow(gHwnd);
                     return 1;
                 }
 
                 /*
-                    处理退格键
+                    处理退格键，backspace
                 */
                 if (s->vkCode == VK_BACK) {
                     int curSize = charVec.size();
@@ -204,6 +205,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                             curCandidateVec.clear();
                             charVec.clear();
                             pageNo = 0;
+                            fanyHideWindow(gHwnd);
                             return 1;
                         }
                     } else {
@@ -247,6 +249,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         // 存储拼音的 vector 也要清掉
                         charVec.clear();
                         pageNo = 0;
+                        fanyHideWindow(gHwnd);
                         return 1;
                     }
                 }

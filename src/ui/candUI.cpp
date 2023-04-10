@@ -131,9 +131,12 @@ void Cleanup() {
 
 /*
     在候选框中打印当前的候选项
-    不打印拼音
 */
 void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
+    if (charVec.size() == 0) {
+        fanyHideWindow(gHwnd);
+        return;
+    }
     std::string pinyinStr(charVec.begin(), charVec.end());
     wText = L"";
     wText = wText + converter.from_bytes(pinyinStr + "\n");
@@ -147,6 +150,9 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
     PostMessage(gHwnd, WM_FANY_REDRAW, 0, 0);
     // std::cout << '\n';
 }
+
+// 隐藏窗口
+void fanyHideWindow(HWND hWnd) { PostMessage(gHwnd, WM_FANY_HIDEWINDOW, 0, 0); }
 
 // 计算新的候选框的 size
 std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
