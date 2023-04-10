@@ -50,3 +50,6 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec);
 // 隐藏窗口
 void fanyHideWindow(HWND hWnd);
 // 重绘窗口
+
+// 计算新的候选框的 size
+std::pair<int, int> calcCandSize(int fontSize, int charCnt);

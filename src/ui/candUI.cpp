@@ -147,3 +147,19 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
     PostMessage(gHwnd, WM_FANY_REDRAW, 0, 0);
     // std::cout << '\n';
 }
+
+// 计算新的候选框的 size
+std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
+    int charNum = 0;
+    if (charVec.size() % 2 == 0) {
+        charNum = charVec.size() / 2;
+    } else {
+        charNum = (charVec.size() + 1) / 2;
+    }
+    std::pair<int, int> size;
+    int width = charNum * 38 + 28;
+    int height = 306;
+    size.first = width;
+    size.second = height;
+    return size;
+}
