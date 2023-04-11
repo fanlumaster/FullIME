@@ -107,7 +107,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         } else if (msg.message == WM_FANY_REDRAW) {
             // wText = L"ni'hc\n1.还行\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
             std::pair<int, int> candSize = calcCandSize(17, 2);
-            SetWindowPos(gHwnd, NULL, 60, 10, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            std::pair<int, int> caretPos = fanyGetCaretPos();
+            SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second,
+                         SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
         } else {
             TranslateMessage(&msg);

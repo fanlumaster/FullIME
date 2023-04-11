@@ -53,3 +53,6 @@ void fanyHideWindow(HWND hWnd);
 
 // 计算新的候选框的 size
 std::pair<int, int> calcCandSize(int fontSize, int charCnt);
+
+// 获取文本光标(编辑光标)的坐标
+std::pair<int, int> fanyGetCaretPos();
