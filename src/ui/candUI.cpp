@@ -44,7 +44,7 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         我们在重绘的时候，得重新获取一下客户区的信息，以及重新定义一下字体的信息？
         不然，字体的拉伸会导致字体的质量变得很差。
     */
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn",
+    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn",
                                        &g_pDWriteTextFormat);
     // 获取可以绘制的客户区的长方形区域
     RECT rc;

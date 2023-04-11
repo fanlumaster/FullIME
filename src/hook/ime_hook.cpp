@@ -282,6 +282,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         printOneDVector(curCandidateVec);
                         return 1;
                     }
+                    if (candidateVec.size() >= 1 && pageNo == 0) {
+                        curCandidateVec = candidateVec[pageNo];
+                        printOneDVector(curCandidateVec);
+                        return 1;
+                    }
                     if (fShiftDown) {
                         sendStringToCursor(converter.from_bytes("——"));
                     } else {
