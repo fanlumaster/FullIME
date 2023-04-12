@@ -169,28 +169,3 @@ std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
     size.second = height;
     return size;
 }
-
-// 获取文本光标(编辑光标)的坐标
-std::pair<int, int> fanyGetCaretPos() {
-    std::pair<int, int> caretPos;
-    HWND target_window = GetForegroundWindow();
-    GUITHREADINFO info;
-    info.cbSize = sizeof(GUITHREADINFO);
-    BOOL result = GetGUIThreadInfo(GetWindowThreadProcessId(target_window, NULL), &info) && info.hwndCaret;
-    if (!result) {
-        // TODO: error log
-    }
-    // std::cout << info.hwndCaret << '\n';
-    POINT pt;
-    pt.x = info.rcCaret.left;
-    pt.y = info.rcCaret.top;
-    ClientToScreen(info.hwndCaret, &pt);
-    if (pt.x == 0 && pt.y == 0) {
-        caretPos.first = 20;
-        caretPos.second = 10;
-        return caretPos;
-    }
-    caretPos.first = static_cast<int>(pt.x);
-    caretPos.second = static_cast<int>(pt.y + 30);
-    return caretPos;
-}

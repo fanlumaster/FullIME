@@ -21,7 +21,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src")
 # 指定 sqlite dll 和 lib 文件路径
 link_directories("${CMAKE_SOURCE_DIR}/libs/sqlite")
 
-add_executable(fullcpp WIN32 "main.cpp" "./src/ui/candUI.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "DeclareDPIAware.manifest")
+add_executable(fullcpp WIN32 "main.cpp" "./src/ui/candUI.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "./src/utils/caret_helper.cpp" "DeclareDPIAware.manifest")
 
 # target_link_libraries(fullcpp "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.22621.0\\um\\x64\\d2d1.lib")
 # set(LIBS d2d1 d3d9 d3d11 d3dcompiler)

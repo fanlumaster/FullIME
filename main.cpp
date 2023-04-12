@@ -1,18 +1,4 @@
 /*
-    目标：
-        在 firstWin09 的基础上，
-        进行细节的微调：
-            根据上屏的汉字对候选框进行尺寸上的自适应调整
-            把该上屏的拼音给绘制到第一行
-        进行项目的整体的调整：
-            把一些函数看是否可以拆分出一个工具文件
-        重要功能添加：
-            输入法候选框状态的显示/隐藏要根据实际的情况来
-
-    实际完成情况：
-
-    下一个版本的目标：
-
     注意！！！Caution!!!
         这个输入法一开始的状态是英文！需要使用 Ctrl + Space 切换一下状态才可以正常输入中文！！！
 */
@@ -33,6 +19,7 @@
 #include "./hook/ime_hook.h"
 #include "./sqlite/sqlite_wrapper.h"
 #include "./ui/candUI.h"
+#include "./utils/caret_helper.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
@@ -44,6 +31,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     std::string dbPath = "../../src/flyciku.db";
     // sqlPageMap = transTableToMap(dbPath, 8);  // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
+    // 初始化 COM
+    CoInitialize(nullptr);  // <-- add this to init COM
     // 创建一个窗口的基本操作
     WNDCLASSEX winClass;
 
@@ -107,7 +96,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         } else if (msg.message == WM_FANY_REDRAW) {
             // wText = L"ni'hc\n1.还行\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
             std::pair<int, int> candSize = calcCandSize(17, 2);
-            std::pair<int, int> caretPos = fanyGetCaretPos();
+            // std::pair<int, int> caretPos = fanyGetCaretPos();
+            std::pair<int, int> caretPos = getCaretPosByAcc();
             SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second,
                          SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
@@ -119,6 +109,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // 注销钩子
     UnhookWindowsHookEx(kbd);
+
+    // 释放 COM
+    CoUninitialize();  // <-- add this to release COM
 
     // 固定操作
     return msg.wParam;
