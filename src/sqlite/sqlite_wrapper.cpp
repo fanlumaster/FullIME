@@ -69,60 +69,107 @@ std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::strin
 }
 
 /*
-    超过两个字的处理逻辑：
-        前两个字使用词库里面的双字词汇，
-        按照四个字符一组进行切分，
-        后面的拼音字符如果是三个，那么，仍然按照双字来查询，
-        最好凑不出三个字符的就使用单字查询
+    查询三个字的条目
+*/
+std::vector<std::pair<std::string, long>> queryThreePinyin(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    // 双拼码是六个字符
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 6 order by weight desc limit 200";
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
 
-        造出 16 个左右的词汇大概就可以了
+/*
+    查询四个字的条目
+*/
+std::vector<std::pair<std::string, long>> queryFourPinyin(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    // 双拼码是八个字符
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 8 order by weight desc limit 200";
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询五个字的条目
+*/
+std::vector<std::pair<std::string, long>> queryFivePinyin(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    // 双拼码是10个字符
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 10 order by weight desc limit 200";
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询超过五个字的条目
+*/
+std::vector<std::pair<std::string, long>> queryManyPinyin(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    // 双拼码是10个字符
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) > 10 order by weight desc limit 200";
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    超过两个字的处理逻辑：
+        主要有三字、四字、五字、七字
+
 
         TODO:
         还可以再优化
 */
 std::vector<std::pair<std::string, long>> queryMultiPinyin(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
-    int splitBegin = 0;
-    std::string curPinyin;
-    std::vector<std::vector<std::pair<std::string, long>>> splitVecs;
-    std::vector<std::pair<std::string, long>> curVec;
-    int minSize = 16;  // 16 并没有什么特殊的含意，个人规定
-    while (splitBegin + 4 < pinyin.size()) {
-        curPinyin = pinyin.substr(splitBegin, 4);
-        curVec = queryTwoPinyin(db, curPinyin);
-        splitVecs.push_back(curVec);
-        splitBegin += 4;
-        if (curVec.size() < minSize) {
-            minSize = curVec.size();
-        }
-    }
-    if (splitBegin < pinyin.size()) {
-        curPinyin = pinyin.substr(splitBegin, 2);
-        curVec = queryPinyin(db, curPinyin);
-        splitVecs.push_back(curVec);
-        splitBegin += 2;
-        if (curVec.size() < minSize) {
-            minSize = curVec.size();
-        }
-    }
-    if (splitBegin < pinyin.size()) {
-        curPinyin = pinyin.substr(splitBegin, pinyin.size());  // 这里截取的只有一个字符了
-        curVec = queryPinyin(db, curPinyin);
-        splitVecs.push_back(curVec);
-        splitBegin += 2;
-        if (curVec.size() < minSize) {
-            minSize = curVec.size();
-        }
-    }
-    for (int i = 0; i < minSize; i++) {
-        std::pair<std::string, long> curPair;
-        std::string curStr = "";
-        long curWeight = 0;
-        for (auto eachVec : splitVecs) {
-            curStr += eachVec[i].first;
-            curWeight += eachVec[i].second;
-        }
-        resVec.push_back(std::make_pair(curStr, curWeight));
+    if (pinyin.size() <= 6) {
+        resVec = queryThreePinyin(db, pinyin);
+    } else if (pinyin.size() <= 8) {
+        resVec = queryFourPinyin(db, pinyin);
+    } else if (pinyin.size() <= 10) {
+        resVec = queryFivePinyin(db, pinyin);
+    } else {
+        resVec = queryManyPinyin(db, pinyin);
     }
     return resVec;
 }
@@ -142,6 +189,7 @@ std::vector<std::vector<std::pair<std::string, long>>> queryPinyinInPage(sqlite3
         if (cnt % 8 == 0) {
             pagedVec.push_back(curVec);
             curVec.clear();
+            cnt = 0;
         }
     }
     if (cnt < 8) {
@@ -168,6 +216,7 @@ std::vector<std::vector<std::pair<std::string, long>>> queryTwoPinyinInPage(sqli
         if (cnt % 8 == 0) {
             pagedVec.push_back(curVec);
             curVec.clear();
+            cnt = 0;
         }
     }
     if (cnt < 8) {
@@ -188,6 +237,7 @@ std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sq
         if (cnt % 8 == 0) {
             pagedVec.push_back(curVec);
             curVec.clear();
+            cnt = 0;
         }
     }
     if (cnt < 8) {

@@ -163,8 +163,11 @@ std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
         charNum = (charVec.size() + 1) / 2;
     }
     std::pair<int, int> size;
-    int width = charNum * 38 + 28;
-    int height = 306;
+    int width = charNum * 24 + 28;
+    // we can use array to hard code this
+    // int height = 288;
+    // int height = (8 + 1) * (24 + 5 * 2);
+    int height = 35 + (31 * curCandidateVec.size()) + 5;
     size.first = width;
     size.second = height;
     return size;
