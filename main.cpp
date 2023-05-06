@@ -14,6 +14,7 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <cstdio>
 
 #include "./flypytblsqlite.h"
 #include "./hook/ime_hook.h"
@@ -25,6 +26,8 @@
 #pragma comment(lib, "dwrite.lib")
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+    
+
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
     // 初始化小鹤双拼的码表，纯双拼二码
