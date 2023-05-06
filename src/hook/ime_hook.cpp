@@ -41,6 +41,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
             */
             BOOL fShiftDown = GetAsyncKeyState(VK_SHIFT) & 0x8000;
             BOOL fCtrlDown = GetAsyncKeyState(VK_CONTROL) & 0x8000;
+            BOOL fAltDown = GetAsyncKeyState(VK_MENU) & 0x8000;
+
+            if (fCtrlDown && fAltDown && s->vkCode == VK_F9) {
+                exit(0);
+            }
 
             // 切换中英文的快捷键换成 Ctrl + Space
             if (fCtrlDown && s->vkCode == VK_SPACE) {
@@ -53,6 +58,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     IMEStateToast = "中";
                 }
                 // TODO: 展示输入法现在的状态
+                    std::cout << IMEStateToast << '\n';
                 return 1;
             }
 

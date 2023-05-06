@@ -13,10 +13,10 @@ sqlite3* openSqlite(std::string dbPath) {
     int rc = sqlite3_open(dbPath.c_str(), &db);
     if (rc) {
         // Todo: 异常处理
-        std::cout << "open db error!" << '\n';
+        // std::cout << "open db error!" << '\n';
         return nullptr;
     }
-    std::cout << "db opened successfully!" << '\n';
+    // std::cout << "db opened successfully!" << '\n';
     return db;
 }
 
@@ -41,7 +41,7 @@ std::vector<std::pair<std::string, long>> queryPinyin(sqlite3* db, std::string p
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -63,7 +63,7 @@ std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::strin
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -84,7 +84,7 @@ std::vector<std::pair<std::string, long>> queryThreePinyin(sqlite3* db, std::str
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -105,7 +105,7 @@ std::vector<std::pair<std::string, long>> queryFourPinyin(sqlite3* db, std::stri
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -126,7 +126,7 @@ std::vector<std::pair<std::string, long>> queryFivePinyin(sqlite3* db, std::stri
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -147,7 +147,7 @@ std::vector<std::pair<std::string, long>> queryManyPinyin(sqlite3* db, std::stri
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     if (result) {
         // Todo: 日志
-        std::cout << "query error!" << '\n';
+        // std::cout << "query error!" << '\n';
     }
     return resVec;
 }

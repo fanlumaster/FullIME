@@ -14,19 +14,39 @@
 #include <codecvt>
 #include <locale>
 #include <string>
-#include <cstdio>
 
 #include "./flypytblsqlite.h"
 #include "./hook/ime_hook.h"
 #include "./sqlite/sqlite_wrapper.h"
 #include "./ui/candUI.h"
 #include "./utils/caret_helper.h"
+#include "./InitConsole.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
-    
+    UNUSED(hInstance);
+    // UNUSED(hPrevInst);
+    UNUSED(szCmdLine);
+    UNUSED(iCmdShow);  // This param is used
+    // create the console
+    if (AllocConsole()) {
+        FILE* pCout;
+        freopen_s(&pCout, "CONOUT$", "w", stdout);
+        // SetConsoleTitleW("Debug Console");
+        SetConsoleTitleW(L"Fany Debug");
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED);
+    }
+    // set std::cout to use my custom streambuf
+    outbuf ob;
+    std::streambuf* sb = std::cout.rdbuf(&ob);
+    // do some work here
+    printf("IME started successfully!\n");
+    // std::cout << "nShowCmd = " << nShowCmd << std::endl;
+    // std::cout << "Now making my first Windows window!" << std::endl;
+    // make sure to restore the original so we don't get a crash on close!
+    std::cout.rdbuf(sb);
 
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
