@@ -9,6 +9,7 @@ std::vector<char> charVec;
 std::unordered_map<std::string, std::vector<std::vector<std::pair<std::string, long>>>> sqlPageMap;
 // 候选字的存储位置
 std::vector<std::vector<std::pair<std::string, long>>> candidateVec;
+// 存储词条的字面量(汉字或者词语)和权重
 std::vector<std::pair<std::string, long>> curCandidateVec;
 // 候选框中的序号
 int pageNo = 0;
@@ -58,7 +59,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     IMEStateToast = "中";
                 }
                 // TODO: 展示输入法现在的状态
-                    std::cout << IMEStateToast << '\n';
+                std::cout << IMEStateToast << '\n';
                 return 1;
             }
 
@@ -206,6 +207,12 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                             // 输送到光标所在的地方
                             std::wstring wstr = converter.from_bytes(curCandidateVec[cInt - 1].first);
                             sendStringToCursor(wstr);
+                            // fany: test
+                            std::string curPinyin(charVec.begin(), charVec.end());
+                            std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second << '\n';
+                            // 更新权重
+                            updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, curCandidateVec[cInt - 1].second);
+
                             // 上屏了之后要把 candidateVec 给清除掉
                             candidateVec.clear();
                             curCandidateVec.clear();
@@ -242,6 +249,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 }
 
                 // 空格键，只有当候选框存在的时候，空格键才会被捕捉
+                // fany: 这里暂时不做词频的修改
                 if (s->vkCode == VK_SPACE) {
                     if (!candidateVec.empty() && !curCandidateVec.empty()) {
                         // 在控制台打印测试

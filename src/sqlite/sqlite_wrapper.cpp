@@ -247,6 +247,36 @@ std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sq
     return pagedVec;
 }
 
+/*
+    更新词库中条目的权重
+
+    update_sql_string = (
+        Rf"update {table_name} set {column_name} = ? where key = ? and value = ?"
+    )
+
+    return:
+            0 -> 更新错误
+            1 -> 更新成功
+*/
+int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long weight) {
+    std::string tblName = "fullpinyinsimple";
+    int curWeight = weight + 10000;
+    std::string curWeightStr = std::to_string(curWeight);
+    std::string updateSQL = "update " + tblName + " set weight = " + curWeightStr + " where key = '" + pinyin + "' and value = '" + hans + "'";
+    std::cout << updateSQL << '\n';
+
+    int result;
+    char* errMsg = nullptr;
+    // 执行查询
+    result = sqlite3_exec(db, updateSQL.c_str(), nullptr, nullptr, &errMsg);
+    if (result != SQLITE_OK) {
+        std::cout << "update error!" << '\n';
+        return 0;
+    }
+    std::cout << "udpate success" << '\n';
+    return 1;
+}
+
 void closeSqliteDB(sqlite3* db) { sqlite3_close(db); }
 
 // int main(int argc, char const* argv[]) {

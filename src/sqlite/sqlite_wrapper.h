@@ -33,4 +33,6 @@ std::vector<std::vector<std::pair<std::string, long>>> queryTwoPinyinInPage(sqli
 
 std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sqlite3* db, std::string pinyin);
 
+int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long weight);
+
 void closeSqliteDB(sqlite3* db);
