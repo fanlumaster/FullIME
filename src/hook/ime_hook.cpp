@@ -93,18 +93,33 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         printOneDVector(curCandidateVec);
                         return 1;
                     } else if (curSize >= 4 && curSize <= 5) {
-                        charVec.pop_back();
-                        std::string hanKey(charVec.begin(), charVec.end());
-                        candidateVec = queryTwoPinyinInPage(db, hanKey);
-                        if (candidateVec.size() > 0) {
-                            curCandidateVec = candidateVec[0];
+                        if (charVec[2] == '[') {
+                            charVec.pop_back();
+                            std::string hanKey(charVec.begin(), charVec.end());
+                            candidateVec = queryPinyinWithHelperCodeInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
+                            // charVec.clear();
+                            // 把当前合的候选框给打印出来
+                            printOneDVector(curCandidateVec);
                         } else {
-                            candidateVec.clear();
-                            curCandidateVec.clear();
+                            charVec.pop_back();
+                            std::string hanKey(charVec.begin(), charVec.end());
+                            candidateVec = queryTwoPinyinInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
+                            // charVec.clear();
+                            // 把当前合的候选框给打印出来
+                            printOneDVector(curCandidateVec);
                         }
-                        // charVec.clear();
-                        // 把当前合的候选框给打印出来
-                        printOneDVector(curCandidateVec);
                         return 1;
                     } else if (curSize >= 6) {
                         charVec.pop_back();
@@ -129,7 +144,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     拼音码的处理
                 */
                 // 字母键
-                if (std::isalpha(c)) {
+                if (std::isalpha(c) || s->vkCode == VK_OEM_4) {
                     if (fShiftDown) {
                         char upperC = std::toupper(c);
                         std::string newStr{upperC};
@@ -151,24 +166,45 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         // charVec.clear();
                     } else if (curSize > 2 && curSize <= 4) {
                         std::string hanKey(charVec.begin(), charVec.end());
-                        candidateVec = queryTwoPinyinInPage(db, hanKey);
-                        if (candidateVec.size() > 0) {
-                            curCandidateVec = candidateVec[0];
+                        if (charVec[2] == '[') {
+                            candidateVec = queryPinyinWithHelperCodeInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
                         } else {
-                            candidateVec.clear();
-                            curCandidateVec.clear();
+                            candidateVec = queryTwoPinyinInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
                         }
                         // charVec.clear();
                     } else if (curSize > 4) {
                         std::string hanKey(charVec.begin(), charVec.end());
-                        candidateVec = queryMultiPinyinInPage(db, hanKey);
-                        if (candidateVec.size() > 0) {
-                            curCandidateVec = candidateVec[0];
+
+                        if (charVec[2] == '[') {
+                            candidateVec = queryPinyinWithHelperCodeInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
                         } else {
-                            candidateVec.clear();
-                            curCandidateVec.clear();
+                            candidateVec = queryMultiPinyinInPage(db, hanKey);
+                            if (candidateVec.size() > 0) {
+                                curCandidateVec = candidateVec[0];
+                            } else {
+                                candidateVec.clear();
+                                curCandidateVec.clear();
+                            }
+                            // charVec.clear();
                         }
-                        // charVec.clear();
                     }
                     if (charVec.size() > 0) {
                         // 把当前合的候选框给打印出来
