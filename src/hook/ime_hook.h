@@ -33,6 +33,9 @@ extern sqlite3* db;
 extern bool IMEState;
 extern std::string IMEStateToast;
 
+// 造词的标志：0 -> 否，1 -> 是
+extern int CREATE_WORD_FLAG;
+
 // 转换字符串
 extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
