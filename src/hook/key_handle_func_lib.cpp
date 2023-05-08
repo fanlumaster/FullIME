@@ -22,10 +22,18 @@ void handleEsc() {
 
 void handleBackspace() {}
 
+/*
+    处理拼音码所对应的条目查询
+    未把每个数量的字符一个一个的分开
+*/
 void handleAlpha(char c) {
     charVec.push_back(std::tolower(c));
     int curSize = charVec.size();
     // 处理所有符合的字符
+    // if (curSize == 1) {
+
+    // }
+
     if (curSize > 0 && curSize <= 2) {
         std::string hanKey(charVec.begin(), charVec.end());
         candidateVec = queryPinyinInPage(db, hanKey);
@@ -81,6 +89,25 @@ void handleAlpha(char c) {
     }
 }
 
+/*
+    处理拼音码所对应的条目查询
+        把每个数量的字符一个一个的分开
+*/
+void handleAlphaByChars(char c) {
+    charVec.push_back(std::tolower(c));
+    // 处理所有符合的字符
+    std::string hanKey(charVec.begin(), charVec.end());
+    candidateVec = queryCharsInPage(db, hanKey);
+    if (candidateVec.size() > 0) {
+        curCandidateVec = candidateVec[0];
+    } else {
+        candidateVec.clear();
+        curCandidateVec.clear();
+    }
+    // 把当前的候选框给打印出来
+    printOneDVector(curCandidateVec);
+}
+
 void handleBackSpace() {
     int curSize = charVec.size();
     if (curSize > 0 && curSize <= 3) {
@@ -134,6 +161,25 @@ void handleBackSpace() {
         // 把当前合的候选框给打印出来
         printOneDVector(curCandidateVec);
     }
+}
+
+/*
+    按照字符的数量，一个一个地来处理
+    其实是直接交给了后面的 sqlite 包装程序
+        这里不需要考虑 pinyin 字符串是否大于 0 的问题，在上层已经考虑好了
+*/
+void handleBackSpaceByChars() {
+    charVec.pop_back();
+    std::string hanKey(charVec.begin(), charVec.end());
+    candidateVec = queryPinyinInPage(db, hanKey);
+    if (candidateVec.size() > 0) {
+        curCandidateVec = candidateVec[0];
+    } else {
+        candidateVec.clear();
+        curCandidateVec.clear();
+    }
+    // 把当前合的候选框给打印出来
+    printOneDVector(curCandidateVec);
 }
 
 void commitCandidate(char c, int canSize, int cInt) {

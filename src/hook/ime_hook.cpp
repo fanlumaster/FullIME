@@ -72,7 +72,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 */
                 if (s->vkCode == VK_BACK) {
                     if (charVec.size() > 0) {
-                        handleBackSpace();
+                        // handleBackSpace();
+                        handleBackSpaceByChars();
                         return 1;
                     } else {
                         break;
@@ -90,7 +91,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         sendStringToCursor(converter.from_bytes(newStr));
                         return 1;
                     }
-                    handleAlpha(c);
+                    // handleAlpha(c);
+                    handleAlphaByChars(c);
                     return 1;  // 1 表示不向下传递给其他钩子函数
                 }
 

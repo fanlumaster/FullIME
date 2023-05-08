@@ -299,23 +299,511 @@ int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long
     return 1;
 }
 
-void closeSqliteDB(sqlite3* db) { sqlite3_close(db); }
+/*
+    查询 1 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>> -> value + weight
+*/
+std::vector<std::pair<std::string, long>> queryOneChar(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    // 因为一个以一个字符开头的条目会很多，所以，这里只取单字，并且，只取权重最大的前 50 个
+    // select * from fullpinyinsimple where key like 'l%' and length(value) == 1 order by weight desc limit 50
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
 
-// int main(int argc, char const* argv[]) {
-//     std::string dbPath = "../../src/flyciku.db";
-//     sqlite3* db = openSqlite(dbPath);
-//     std::vector<std::pair<std::string, long>> resVec = queryPinyin(db, "ni");
-//     std::vector<std::vector<std::pair<std::string, long>>> pagedVec = queryPinyinInPage(db, "ni");
-//     for (auto fstVar : pagedVec) {
-//         std::cout << fstVar.size() << '\n';
-//         for (auto sndVar : fstVar) {
-//             std::cout << sndVar.first << "\t" << sndVar.second << '\n';
-//         }
-//         std::cout << "split ===========" << '\n';
-//     }
-//     // for (auto eachPair : resVec) {
-//     //     std::cout << eachPair.first << "\t" << eachPair.second << '\n';
-//     // }
-//     closeSqliteDB(db);
-//     return 0;
-// }
+/*
+    查询 2 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryTwoChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 3 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 4 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryFourChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 5 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryFiveChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 4);  // 切前两个字符
+    std::string pinyin03 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 3 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL03 = "select * from " + tblName + " where key like " + "'" + pinyin03 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第三次查询
+    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 6 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> querySixChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 4);  // 切前两个字符
+    std::string pinyin03 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 3 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL03 = "select * from " + tblName + " where key like " + "'" + pinyin03 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第三次查询
+    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 7 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> querySevenChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 6);  // 切前两个字符
+    std::string pinyin03 = pinyin.substr(0, 4);  // 切前两个字符
+    std::string pinyin04 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 4 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 3 order by weight desc limit 50";
+    std::string querySQL03 = "select * from " + tblName + " where key like " + "'" + pinyin03 + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL04 = "select * from " + tblName + " where key like " + "'" + pinyin04 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第三次查询
+    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第四次查询
+    result = sqlite3_exec(db, querySQL04.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 8 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryEightChars(sqlite3* db, std::string pinyin) {
+    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin02 = pinyin.substr(0, 6);  // 切前两个字符
+    std::string pinyin03 = pinyin.substr(0, 4);  // 切前两个字符
+    std::string pinyin04 = pinyin.substr(0, 2);  // 切前两个字符
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 4 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like " + "'" + pinyin02 + "%'" + " and length(value) == 3 order by weight desc limit 50";
+    std::string querySQL03 = "select * from " + tblName + " where key like " + "'" + pinyin03 + "%'" + " and length(value) == 2 order by weight desc limit 50";
+    std::string querySQL04 = "select * from " + tblName + " where key like " + "'" + pinyin04 + "%'" + " and length(value) == 1 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第二次查询
+    result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第三次查询
+    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第四次查询
+    result = sqlite3_exec(db, querySQL04.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 9 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryNineChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 10 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryTenChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 11 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryElevenChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 12 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryTwelveChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 13 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryThirteenChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    查询 14 个字符
+    参数：
+        pinyin: string
+    返回值：vector<vector<pair<string, long>>>
+*/
+std::vector<std::pair<std::string, long>> queryFourteenChars(sqlite3* db, std::string pinyin) {
+    std::vector<std::pair<std::string, long>> resVec;
+    std::string tblName = "fullpinyinsimple";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
+    // std::cout << querySQL << '\n';
+    int result;
+    char* errMsg = nullptr;
+    int itemCount = 0;
+    UserData userData{itemCount, resVec};
+    // 查询
+    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    return resVec;
+}
+
+/*
+    所有查询的分页
+*/
+std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string pinyin) {
+    std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
+    std::vector<std::pair<std::string, long>> noPagedVec = queryPinyin(db, pinyin);
+    int pinyinSize = pinyin.size();
+    if (pinyinSize == 1) {
+        noPagedVec = queryOneChar(db, pinyin);
+    } else if (pinyinSize == 2) {
+        noPagedVec = queryTwoChars(db, pinyin);
+    } else if (pinyinSize == 3) {
+        noPagedVec = queryThreeChars(db, pinyin);
+    } else if (pinyinSize == 4) {
+        noPagedVec = queryFourChars(db, pinyin);
+    } else if (pinyinSize == 5) {
+        noPagedVec = queryFiveChars(db, pinyin);
+    } else if (pinyinSize == 6) {
+        noPagedVec = querySixChars(db, pinyin);
+    } else if (pinyinSize == 7) {
+        noPagedVec = querySevenChars(db, pinyin);
+    } else if (pinyinSize == 8) {
+        noPagedVec = queryEightChars(db, pinyin);
+    } else if (pinyinSize == 9) {
+        noPagedVec = queryNineChars(db, pinyin);
+    } else if (pinyinSize == 10) {
+        noPagedVec = queryTenChars(db, pinyin);
+    } else if (pinyinSize == 11) {
+        noPagedVec = queryElevenChars(db, pinyin);
+    } else if (pinyinSize == 12) {
+        noPagedVec = queryTwelveChars(db, pinyin);
+    } else if (pinyinSize == 13) {
+        noPagedVec = queryThirteenChars(db, pinyin);
+    } else if (pinyinSize == 14) {
+        noPagedVec = queryFourChars(db, pinyin);
+    }
+    // 分页
+    doPageVector(pagedVec, noPagedVec);
+    return pagedVec;
+}
+
+void closeSqliteDB(sqlite3* db) { sqlite3_close(db); }

@@ -8,8 +8,10 @@ void handleEsc();
 void handleBackspace();
 
 void handleAlpha(char c);
+void handleAlphaByChars(char c);
 
 void handleBackSpace();
+void handleBackSpaceByChars();
 
 void commitCandidate(char c, int canSize, int cInt);
 
