@@ -30,7 +30,7 @@ sqlite3* openSqlite(std::string dbPath) {
 std::vector<std::pair<std::string, long>> queryPinyin(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 2 order by weight desc limit 50";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -49,7 +49,7 @@ std::vector<std::pair<std::string, long>> queryPinyin(sqlite3* db, std::string p
 std::vector<std::pair<std::string, long>> queryPinyinWithHelperCode(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 5 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 5 order by weight desc limit 50";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -71,7 +71,7 @@ std::vector<std::pair<std::string, long>> queryPinyinWithHelperCode(sqlite3* db,
 std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 4 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 4 order by weight desc limit 50";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -94,7 +94,7 @@ std::vector<std::pair<std::string, long>> queryThreePinyin(sqlite3* db, std::str
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
     // 双拼码是六个字符
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 6 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 6 order by weight desc limit 50";
     int result;
     char* errMsg = nullptr;
     int itemCount = 0;
@@ -115,7 +115,7 @@ std::vector<std::pair<std::string, long>> queryFourPinyin(sqlite3* db, std::stri
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
     // 双拼码是八个字符
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 8 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 8 order by weight desc limit 50";
     int result;
     char* errMsg = nullptr;
     int itemCount = 0;
@@ -136,7 +136,7 @@ std::vector<std::pair<std::string, long>> queryFivePinyin(sqlite3* db, std::stri
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
     // 双拼码是10个字符
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 10 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 10 order by weight desc limit 50";
     int result;
     char* errMsg = nullptr;
     int itemCount = 0;
@@ -157,7 +157,7 @@ std::vector<std::pair<std::string, long>> queryManyPinyin(sqlite3* db, std::stri
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
     // 双拼码是10个字符
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) > 10 order by weight desc limit 200";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) > 10 order by weight desc limit 50";
     int result;
     char* errMsg = nullptr;
     int itemCount = 0;
