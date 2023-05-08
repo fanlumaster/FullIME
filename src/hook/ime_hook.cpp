@@ -157,6 +157,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         return 1;
                     }
                     if (candidateVec.size() > 1 && pageNo < candidateVec.size() - 1) {
+                        // std::cout << "raw pageNo: " << pageNo << '\t' << "raw candSize: " << candidateVec.size() << '\n';
                         pageNo += 1;
                         // std::cout << "pageNo: " << pageNo << '\n';
                         curCandidateVec = candidateVec[pageNo];

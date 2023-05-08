@@ -1,5 +1,26 @@
 #include "./sqlite_wrapper.h"
 
+/*
+    处理分页
+*/
+void doPageVector(std::vector<std::vector<std::pair<std::string, long>>>& pagedVec, std::vector<std::pair<std::string, long>>& noPagedVec) {
+    std::vector<std::pair<std::string, long>> curVec;
+    int cnt = 0;
+    for (auto eachEle : noPagedVec) {
+        curVec.push_back(eachEle);
+        cnt += 1;
+        if (cnt % 8 == 0) {
+            pagedVec.push_back(curVec);
+            curVec.clear();
+            cnt = 0;
+        }
+    }
+    if (cnt < 8 && cnt != 0) {
+        pagedVec.push_back(curVec);
+        curVec.clear();
+    }
+}
+
 int queryPinyinCallback(void* data, int argc, char** argv, char** azColName) {
     UserData* userData = static_cast<UserData*>(data);
     std::vector<std::pair<std::string, long>>& myVec = userData->result;
@@ -41,7 +62,7 @@ std::vector<std::pair<std::string, long>> queryPinyin(sqlite3* db, std::string p
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
-        // std::cout << "query error!" << '\n';
+        std::cout << "query error!" << '\n';
     }
     return resVec;
 }
@@ -49,7 +70,8 @@ std::vector<std::pair<std::string, long>> queryPinyin(sqlite3* db, std::string p
 std::vector<std::pair<std::string, long>> queryPinyinWithHelperCode(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 5 order by weight desc limit 50";
+    // std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 5 order by weight desc limit 50";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 5 order by weight desc";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -71,7 +93,8 @@ std::vector<std::pair<std::string, long>> queryPinyinWithHelperCode(sqlite3* db,
 std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::string pinyin) {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 4 order by weight desc limit 50";
+    // std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 4 order by weight desc limit 50";
+    std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) == 4 order by weight desc";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -79,7 +102,7 @@ std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::strin
     UserData userData{itemCount, resVec};
     // 查询
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
-    // std::cout << "itemCnt = " << itemCount << '\n';
+    std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
         // std::cout << "query error!" << '\n';
@@ -203,21 +226,10 @@ std::vector<std::pair<std::string, long>> queryMultiPinyin(sqlite3* db, std::str
 std::vector<std::vector<std::pair<std::string, long>>> queryPinyinInPage(sqlite3* db, std::string pinyin) {
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
     std::vector<std::pair<std::string, long>> noPagedVec = queryPinyin(db, pinyin);
-    std::vector<std::pair<std::string, long>> curVec;
-    int cnt = 0;
-    for (auto eachEle : noPagedVec) {
-        curVec.push_back(eachEle);
-        cnt += 1;
-        if (cnt % 8 == 0) {
-            pagedVec.push_back(curVec);
-            curVec.clear();
-            cnt = 0;
-        }
-    }
-    if (cnt < 8) {
-        pagedVec.push_back(curVec);
-        curVec.clear();
-    }
+
+    // 分页
+    doPageVector(pagedVec, noPagedVec);
+
     return pagedVec;
 }
 
@@ -227,21 +239,10 @@ std::vector<std::vector<std::pair<std::string, long>>> queryPinyinInPage(sqlite3
 std::vector<std::vector<std::pair<std::string, long>>> queryPinyinWithHelperCodeInPage(sqlite3* db, std::string pinyin) {
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
     std::vector<std::pair<std::string, long>> noPagedVec = queryPinyinWithHelperCode(db, pinyin);
-    std::vector<std::pair<std::string, long>> curVec;
-    int cnt = 0;
-    for (auto eachEle : noPagedVec) {
-        curVec.push_back(eachEle);
-        cnt += 1;
-        if (cnt % 8 == 0) {
-            pagedVec.push_back(curVec);
-            curVec.clear();
-            cnt = 0;
-        }
-    }
-    if (cnt < 8) {
-        pagedVec.push_back(curVec);
-        curVec.clear();
-    }
+
+    // 分页
+    doPageVector(pagedVec, noPagedVec);
+
     return pagedVec;
 }
 
@@ -251,45 +252,20 @@ std::vector<std::vector<std::pair<std::string, long>>> queryPinyinWithHelperCode
 std::vector<std::vector<std::pair<std::string, long>>> queryTwoPinyinInPage(sqlite3* db, std::string pinyin) {
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
     std::vector<std::pair<std::string, long>> noPagedVec = queryTwoPinyin(db, pinyin);
-    // for (auto each : noPagedVec) {
-    //     std::cout << "fany => " << each.first << '\t' << each.second << '\n';
-    // }
-    std::vector<std::pair<std::string, long>> curVec;
-    int cnt = 0;
-    for (auto eachEle : noPagedVec) {
-        curVec.push_back(eachEle);
-        cnt += 1;
-        if (cnt % 8 == 0) {
-            pagedVec.push_back(curVec);
-            curVec.clear();
-            cnt = 0;
-        }
-    }
-    if (cnt < 8) {
-        pagedVec.push_back(curVec);
-        curVec.clear();
-    }
+
+    // 分页
+    doPageVector(pagedVec, noPagedVec);
+
     return pagedVec;
 }
 
 std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sqlite3* db, std::string pinyin) {
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
     std::vector<std::pair<std::string, long>> noPagedVec = queryMultiPinyin(db, pinyin);
-    std::vector<std::pair<std::string, long>> curVec;
-    int cnt = 0;
-    for (auto eachEle : noPagedVec) {
-        curVec.push_back(eachEle);
-        cnt += 1;
-        if (cnt % 8 == 0) {
-            pagedVec.push_back(curVec);
-            curVec.clear();
-            cnt = 0;
-        }
-    }
-    if (cnt < 8) {
-        pagedVec.push_back(curVec);
-        curVec.clear();
-    }
+
+    // 分页
+    doPageVector(pagedVec, noPagedVec);
+
     return pagedVec;
 }
 

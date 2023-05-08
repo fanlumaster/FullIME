@@ -16,6 +16,10 @@ struct UserData {
     std::vector<std::pair<std::string, long>>& result;
 };
 
+// 一些工具性的函数
+// 处理分页
+void doPageVector(std::vector<std::vector<std::pair<std::string, long>>>& pagedVec, std::vector<std::pair<std::string, long>>& noPagedVec);
+
 // 回调函数
 int queryPinyinCallback(void* data, int argc, char** argv, char** azColName);
 
