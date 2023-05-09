@@ -20,8 +20,6 @@ void handleEsc() {
     fanyHideWindow(gHwnd);
 }
 
-void handleBackspace() {}
-
 /*
     处理拼音码所对应的条目查询
     未把每个数量的字符一个一个的分开
@@ -171,7 +169,8 @@ void handleBackSpace() {
 void handleBackSpaceByChars() {
     charVec.pop_back();
     std::string hanKey(charVec.begin(), charVec.end());
-    candidateVec = queryPinyinInPage(db, hanKey);
+    // std::cout << "fany test backspace -> " << hanKey << '\n';
+    candidateVec = queryCharsInPage(db, hanKey);
     if (candidateVec.size() > 0) {
         curCandidateVec = candidateVec[0];
     } else {

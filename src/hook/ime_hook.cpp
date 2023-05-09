@@ -1,7 +1,7 @@
 #include "./ime_hook.h"
 
 #include "../sqlite/sqlite_wrapper.h"
-#include "../ui/candUI.h"
+#include "../ui/cand_ui.h"
 #include "./key_handle_func_lib.h"
 
 // 全局变量，用来捕捉键盘的字符

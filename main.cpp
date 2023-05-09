@@ -15,12 +15,12 @@
 #include <locale>
 #include <string>
 
+#include "./InitConsole.h"
 #include "./flypytblsqlite.h"
 #include "./hook/ime_hook.h"
 #include "./sqlite/sqlite_wrapper.h"
-#include "./ui/candUI.h"
+#include "./ui/cand_ui.h"
 #include "./utils/caret_helper.h"
-#include "./InitConsole.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
@@ -121,8 +121,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             std::pair<int, int> candSize = calcCandSize(17, 2);
             // std::pair<int, int> caretPos = fanyGetCaretPos();
             std::pair<int, int> caretPos = getGeneralCaretPos();
-            SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second,
-                         SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
         } else {
             TranslateMessage(&msg);

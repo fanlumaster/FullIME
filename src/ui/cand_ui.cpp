@@ -1,4 +1,4 @@
-#include "./candUI.h"
+#include "./cand_ui.h"
 
 #include "../hook/ime_hook.h"
 
@@ -44,13 +44,11 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         我们在重绘的时候，得重新获取一下客户区的信息，以及重新定义一下字体的信息？
         不然，字体的拉伸会导致字体的质量变得很差。
     */
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn",
-                                       &g_pDWriteTextFormat);
+    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
     // 获取可以绘制的客户区的长方形区域
     RECT rc;
     GetClientRect(hwnd, &rc);
-    g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
-                                          D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
+    g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
 
     // 清除背景为白色
     // pRenderTarget->BeginDraw();
@@ -72,8 +70,7 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
 
     RECT rect;
     GetClientRect(hwnd, &rect);
-    D2D1_RECT_F layoutRect =
-        D2D1::RectF(static_cast<FLOAT>(rect.left), static_cast<FLOAT>(rect.top), static_cast<FLOAT>(rect.right), static_cast<FLOAT>(rect.bottom));
+    D2D1_RECT_F layoutRect = D2D1::RectF(static_cast<FLOAT>(rect.left), static_cast<FLOAT>(rect.top), static_cast<FLOAT>(rect.right), static_cast<FLOAT>(rect.bottom));
     g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &g_pBrush);
     g_pRenderTarget->DrawText(szText, wcslen(szText), g_pDWriteTextFormat, layoutRect, g_pBrush);
 
@@ -100,15 +97,13 @@ void CreateDWResource(HWND hwnd) {
 
     // 初始化字体
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn",
-                                       &g_pDWriteTextFormat);
+    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn", &g_pDWriteTextFormat);
 
     // 获取可以绘制的客户区的长方形区域
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    hr = g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
-                                               D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
+    hr = g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
 
     if (FAILED(hr)) {
         MessageBox(hwnd, L"Create render target failed!", L"Error", 0);
