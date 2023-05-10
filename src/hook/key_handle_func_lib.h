@@ -15,6 +15,9 @@ void handleAlphaByChars(char c);
 void handleBackSpace();
 void handleBackSpaceByChars();
 
+//
+void handleEnterByChars();
+
 void commitCandidate(char c, int canSize, int cInt);
 
 void handleSpace();

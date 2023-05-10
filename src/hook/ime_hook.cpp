@@ -27,7 +27,7 @@ std::string IMEStateToast = "英";
 // 造词的标志：0 -> 否，1 -> 是
 int CREATE_WORD_FLAG;
 // 造词需要用到的字符串
-std::vector<std::string> committedPinyin; // 拼音
+std::vector<std::string> committedPinyin;  // 拼音
 std::vector<std::string> committedChars;
 
 // 转换字符串
@@ -77,6 +77,18 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     if (charVec.size() > 0) {
                         // handleBackSpace();
                         handleBackSpaceByChars();
+                        return 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                /*
+                    处理回车键
+                */
+                if (s->vkCode == VK_RETURN) {
+                    if (charVec.size() > 0) {
+                        handleEnterByChars();
                         return 1;
                     } else {
                         break;

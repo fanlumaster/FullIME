@@ -195,6 +195,21 @@ void handleBackSpaceByChars() {
     printOneDVector(curCandidateVec);
 }
 
+/*
+
+*/
+void handleEnterByChars() {
+    std::string curPinyin(charVec.begin(), charVec.end());
+    std::wstring wCurPinyin = converter.from_bytes(curPinyin);
+    sendStringToCursor(wCurPinyin);
+    // 清理
+    candidateVec.clear();
+    curCandidateVec.clear();
+    pageNo = 0;
+    charVec.clear();
+    fanyHideWindow(gHwnd);
+}
+
 void commitCandidate(char c, int canSize, int cInt) {
     // 在控制台打印测试
     // std::cout << curCandidateVec[cInt - 1].first << '\n';
