@@ -56,7 +56,8 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
     // pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
     // 如果想改变输入法候选框的背景颜色，可以在这里修改
     // g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Green));
-    g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+    // g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+    g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::LightGreen));
 
     // 设置绘制参数
     g_pRenderTarget->SetTransform(D2D1::IdentityMatrix());

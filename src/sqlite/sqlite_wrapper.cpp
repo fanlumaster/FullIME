@@ -370,12 +370,13 @@ std::vector<std::pair<std::string, long>> queryTwoChars(sqlite3* db, std::string
     返回值：vector<vector<pair<string, long>>>
 */
 std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3* db, std::string pinyin) {
-    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
+    std::string pinyin01 = pinyin.substr(2, 1);  // 切最后一个字符
     std::string pinyin02 = pinyin.substr(0, 2);  // 切前两个字符
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like '" + pinyin + "%' and key >= '" + pinyin + "a' and key <= '" + pinyin + "z' and length(key) == 4 order by weight desc limit 50";
-    std::string querySQL02 = "select * from " + tblName + " where key ='" + pinyin02 + "' order by weight desc limit 50";
+    std::string querySQL = "select * from " + tblName + " where key like '" + pinyin02 + "[" + pinyin01 + "%' and key >= '" + pinyin02 + "[" + pinyin01 + "a' and key <= '" + pinyin + "[" + pinyin01 + "z' and length(key) == 5 order by weight desc limit 50";
+    std::string querySQL02 = "select * from " + tblName + " where key like '" + pinyin + "%' and key >= '" + pinyin + "a' and key <= '" + pinyin + "z' and length(key) == 4 order by weight desc limit 50";
+    std::string querySQL03 = "select * from " + tblName + " where key ='" + pinyin02 + "' order by weight desc limit 50";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;
@@ -390,6 +391,13 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3* db, std::stri
     }
     // 第二次查询
     result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // std::cout << "itemCnt = " << itemCount << '\n';
+    if (result) {
+        // Todo: 日志
+        std::cout << "query error!" << '\n';
+    }
+    // 第三次查询
+    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
