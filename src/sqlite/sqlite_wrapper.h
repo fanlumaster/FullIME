@@ -22,6 +22,8 @@ void doPageVector(std::vector<std::vector<std::pair<std::string, long>>>& pagedV
 
 // 回调函数
 int queryPinyinCallback(void* data, int argc, char** argv, char** azColName);
+// 这个函数是给 select count(*) 使用的
+int simpleQueryPinyinCallback(void* data, int argc, char** argv, char** azColName);
 
 sqlite3* openSqlite(std::string dbPath);
 
@@ -57,4 +59,6 @@ std::vector<std::pair<std::string, long>> queryFourteenChars(sqlite3* db, std::s
 // 分页，就在这个一个函数里面处理了
 std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string pinyin);
 
+// 插入新的条目
+int insertItem(sqlite3* db, std::string pinyin, std::string hanValue);
 void closeSqliteDB(sqlite3* db);

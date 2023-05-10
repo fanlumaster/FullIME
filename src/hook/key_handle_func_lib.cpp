@@ -281,7 +281,7 @@ void clearCandRelative(std::string curStr, std::string hanKey) {
             // }
             std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
             // TODO: 插入新的条目
-
+            insertItem(db, committedPinyin[0], preInsertStr);
             // 清空造词用到的 vector
             committedChars.clear();
             committedPinyin.clear();
