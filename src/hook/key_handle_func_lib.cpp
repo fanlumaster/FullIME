@@ -106,6 +106,20 @@ void handleAlphaByChars(char c) {
     printOneDVector(curCandidateVec);
 }
 
+void handleAlphaByChars() {
+    // 处理所有符合的字符
+    std::string hanKey(charVec.begin(), charVec.end());
+    candidateVec = queryCharsInPage(db, hanKey);
+    if (candidateVec.size() > 0) {
+        curCandidateVec = candidateVec[0];
+    } else {
+        candidateVec.clear();
+        curCandidateVec.clear();
+    }
+    // 把当前的候选框给打印出来
+    printOneDVector(curCandidateVec);
+}
+
 void handleBackSpace() {
     int curSize = charVec.size();
     if (curSize > 0 && curSize <= 3) {
@@ -194,11 +208,25 @@ void commitCandidate(char c, int canSize, int cInt) {
     updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, curCandidateVec[cInt - 1].second);
 
     // 上屏了之后要把 candidateVec 给清除掉
-    candidateVec.clear();
-    curCandidateVec.clear();
-    charVec.clear();
-    pageNo = 0;
-    fanyHideWindow(gHwnd);
+    // candidateVec.clear();
+    // curCandidateVec.clear();
+    // charVec.clear();
+    // pageNo = 0;
+    // fanyHideWindow(gHwnd);
+    std::string curStr = curCandidateVec[cInt - 1].first;
+    // std::string hanKey(charVec.begin(), charVec.end());
+    clearCandRelative(curStr, curPinyin);
+}
+
+void handleSpace() {
+    // 输送到光标所在的地方
+    std::string curStr = curCandidateVec[0].first;
+    std::string hanKey(charVec.begin(), charVec.end());
+    std::wstring wstr = converter.from_bytes(curStr);
+    sendStringToCursor(wstr);
+    // 上屏了之后要把 candidateVec 给清除掉
+    // std::cout << "fany here -1" << '\n';
+    clearCandRelative(curStr, hanKey);
 }
 
 void handleShiftDigit(char c) {
@@ -222,5 +250,44 @@ void handleShiftDigit(char c) {
         sendStringToCursor(converter.from_bytes("（"));
     } else if (c == '0') {
         sendStringToCursor(converter.from_bytes("）"));
+    }
+}
+
+// 上屏之后的清理候选框相关的参数
+void clearCandRelative(std::string curStr, std::string hanKey) {
+    candidateVec.clear();
+    curCandidateVec.clear();
+    pageNo = 0;
+    // std::cout << curStr << '\t' << curStr.size() << '\t' << hanKey.size() << '\n';
+    // 要注意，这里一个汉字的 size 是 3!
+    if (curStr.size() / 3 * 2 < hanKey.size()) {
+        committedChars.push_back(curStr);
+        committedPinyin.push_back(hanKey);
+        // std::cout << "fany here" << '\n';
+        charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);  // 这个擦除以后可以自动把 size 变成缩小后的程度
+        // charVec.resize(charVec.size() - curStr.size() / 3 * 2);
+        handleAlphaByChars();
+    } else {
+        if (committedChars.size() > 0) {
+            committedChars.push_back(curStr);
+            committedPinyin.push_back(hanKey);
+            std::string preInsertStr = "";
+            std::string preInsertPinyin = "";
+            for (std::string eachStr : committedChars) {
+                preInsertStr += eachStr;
+            }
+            // for (std::string eachPinyin : committedPinyin) {
+            //     preInsertPinyin += eachPinyin;
+            // }
+            std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
+            // TODO: 插入新的条目
+
+            // 清空造词用到的 vector
+            committedChars.clear();
+            committedPinyin.clear();
+        }
+        // 存储拼音的 vector 也要清掉
+        charVec.clear();
+        fanyHideWindow(gHwnd);
     }
 }

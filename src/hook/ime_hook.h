@@ -35,6 +35,10 @@ extern std::string IMEStateToast;
 
 // 造词的标志：0 -> 否，1 -> 是
 extern int CREATE_WORD_FLAG;
+// 造词需要用到的字符串
+extern std::vector<std::string> committedPinyin; // 拼音
+extern std::vector<std::string> committedChars; // 汉字
+
 
 // 转换字符串
 extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

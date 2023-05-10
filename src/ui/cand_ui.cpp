@@ -9,7 +9,7 @@ IDWriteTextFormat *g_pDWriteTextFormat = nullptr;
 ID2D1HwndRenderTarget *g_pRenderTarget = nullptr;  // 全局的 hwndRenderTarget
 ID2D1SolidColorBrush *g_pBrush;                    // 全局的笔刷
 
-std::wstring wText = L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
+std::wstring wText = L"";
 
 // 自定义消息码
 INT WM_FANY_HIDEWINDOW = RegisterWindowMessage(TEXT("MyHideWindowMessage"));
@@ -78,7 +78,7 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
     HRESULT hr = g_pRenderTarget->EndDraw();
     if (FAILED(hr)) {
         // 错误处理
-        MessageBox(NULL, TEXT("结束绘制出错！"), L"error", MB_ICONERROR);
+        MessageBox(NULL, TEXT("End Drawing Error!"), L"error", MB_ICONERROR);
     }
     // 释放资源就不在这里操作了，而是专门在程序结束的时候统一释放
 }

@@ -25,7 +25,10 @@ bool IMEState = false;
 std::string IMEStateToast = "英";
 
 // 造词的标志：0 -> 否，1 -> 是
-extern int CREATE_WORD_FLAG;
+int CREATE_WORD_FLAG;
+// 造词需要用到的字符串
+std::vector<std::string> committedPinyin; // 拼音
+std::vector<std::string> committedChars;
 
 // 转换字符串
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -135,16 +138,7 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 // fany: 这里暂时不做词频的修改
                 if (s->vkCode == VK_SPACE) {
                     if (!candidateVec.empty() && !curCandidateVec.empty()) {
-                        // 输送到光标所在的地方
-                        std::wstring wstr = converter.from_bytes(curCandidateVec[0].first);
-                        sendStringToCursor(wstr);
-                        // 上屏了之后要把 candidateVec 给清除掉
-                        candidateVec.clear();
-                        curCandidateVec.clear();
-                        // 存储拼音的 vector 也要清掉
-                        charVec.clear();
-                        pageNo = 0;
-                        fanyHideWindow(gHwnd);
+                        handleSpace();
                         return 1;
                     }
                 }
