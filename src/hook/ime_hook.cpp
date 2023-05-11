@@ -60,6 +60,15 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 toggleIMEState();
                 return 1;
             }
+            // if (fCtrlDown && s->vkCode == VK_LSHIFT) {
+            //     toggleIMEState();
+            //     return 1;
+            // }
+            // if (s->vkCode == VK_SHIFT) {
+            //     std::cout << "shift detected" << '\n';
+            //     toggleIMEState();
+            //     return 1;
+            // }
 
             if (IMEState) {
                 /*
@@ -299,10 +308,50 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     }
                     return 1;
                 }
+
+                // 等上面的逻辑都处理结束了，再来看这里的单独的 Shift
+                // if (s->vkCode == VK_LSHIFT) {
+                //     toggleIMEState();
+                //     return 1;
+                // }
+                // if (fShiftDown) {
+                //     // std::cout << "f shift down" << '\n';
+                //     return 0;
+                // } else {
+                //     if (s->vkCode == VK_LSHIFT) {
+                //         toggleIMEState();
+                //     }
+                // }
+            } else {
+                // if (fShiftDown) {
+                //     // std::cout << "f shift down" << '\n';
+                //     return 0;
+                // } else {
+                //     if (s->vkCode == VK_LSHIFT) {
+                //         toggleIMEState();
+                //     }
+                // }
+                // if (s->vkCode == VK_LSHIFT) {
+                //     toggleIMEState();
+                //     return 1;
+                // }
             }
 
             break;
         }
+
+        case WM_KEYUP: {
+            // if (s->vkCode == VK_SPACE) {
+            //     std::cout << "space keyup!!!" << '\n';
+            //     return 1;
+            // }
+            // if (s->vkCode == VK_LSHIFT) {
+            //     // std::cout << "keyup!!!" << '\n';
+            //     toggleIMEState();
+            //     return 1;
+            // }
+        }
+
         default:
             break;
     }

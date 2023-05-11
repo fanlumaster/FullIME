@@ -99,7 +99,7 @@ void handleAlphaByChars(char c) {
     std::string hanKey(charVec.begin(), charVec.end());
     // auto start = std::chrono::high_resolution_clock::now();
     candidateVec = queryCharsInPage(db, hanKey);
-    std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
+    // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
     // auto end = std::chrono::high_resolution_clock::now();
     // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
@@ -232,7 +232,7 @@ void commitCandidate(char c, int canSize, int cInt) {
     sendStringToCursor(wstr);
     // fany: test
     std::string curPinyin(charVec.begin(), charVec.end());
-    std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second << '\n';
+    // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second << '\n';
     // 更新权重
     updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, curCandidateVec[cInt - 1].second);
 
@@ -308,7 +308,7 @@ void clearCandRelative(std::string curStr, std::string hanKey) {
             // for (std::string eachPinyin : committedPinyin) {
             //     preInsertPinyin += eachPinyin;
             // }
-            std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
+            // std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
             // TODO: 插入新的条目
             insertItem(db, committedPinyin[0], preInsertStr);
             // 清空造词用到的 vector

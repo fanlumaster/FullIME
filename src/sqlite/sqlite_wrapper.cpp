@@ -112,7 +112,7 @@ std::vector<std::pair<std::string, long>> queryTwoPinyin(sqlite3* db, std::strin
     UserData userData{itemCount, resVec};
     // 查询
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
-    std::cout << "itemCnt = " << itemCount << '\n';
+    // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
         // std::cout << "query error!" << '\n';
@@ -296,7 +296,7 @@ int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long
     int curWeight = weight + 50000;
     std::string curWeightStr = std::to_string(curWeight);
     std::string updateSQL = "update " + tblName + " set weight = " + curWeightStr + " where key = '" + pinyin + "' and value = '" + hans + "'";
-    std::cout << updateSQL << '\n';
+    // std::cout << updateSQL << '\n';
 
     int result;
     char* errMsg = nullptr;
@@ -306,7 +306,7 @@ int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long
         std::cout << "update error!" << '\n';
         return 0;
     }
-    std::cout << "udpate success" << '\n';
+    // std::cout << "udpate success" << '\n';
     return 1;
 }
 
@@ -929,7 +929,7 @@ int insertItem(sqlite3* db, std::string pinyin, std::string hanValue) {
             // Todo: 日志
             std::cout << "update error!" << '\n';
         }
-        std::cout << "insert success!" << '\n';
+        // std::cout << "insert success!" << '\n';
     }
     return 0;
 }
