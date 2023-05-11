@@ -275,7 +275,7 @@ void clearCandRelative(std::string curStr, std::string hanKey) {
     pageNo = 0;
     // std::cout << curStr << '\t' << curStr.size() << '\t' << hanKey.size() << '\n';
     // 要注意，这里一个汉字的 size 是 3! 以及，三码不造字
-    if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3) {
+    if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.find('[') == std::string::npos) {
         committedChars.push_back(curStr);
         committedPinyin.push_back(hanKey);
         // std::cout << "fany here" << '\n';
