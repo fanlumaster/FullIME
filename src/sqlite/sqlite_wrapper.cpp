@@ -1,5 +1,7 @@
 #include "./sqlite_wrapper.h"
 
+#include <chrono>
+
 /*
     处理分页
 */
@@ -290,7 +292,8 @@ std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sq
 */
 int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long weight) {
     std::string tblName = "fullpinyinsimple";
-    int curWeight = weight + 10000;
+    // int curWeight = weight + 10000;
+    int curWeight = weight + 50000;
     std::string curWeightStr = std::to_string(curWeight);
     std::string updateSQL = "update " + tblName + " set weight = " + curWeightStr + " where key = '" + pinyin + "' and value = '" + hans + "'";
     std::cout << updateSQL << '\n';
@@ -320,6 +323,7 @@ std::vector<std::pair<std::string, long>> queryOneChar(sqlite3* db, std::string 
     // select * from fullpinyinsimple where key like 'l%' and length(value) == 1 order by weight desc limit 50
     // std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + " and length(value) == 1 order by weight desc limit 50";
     // select * from fullpinyinsimple where key like 'l%' and key >= 'la' and key <= 'lz' and length(key) == 4 order by weight desc limit 50;
+    // auto start = std::chrono::high_resolution_clock::now();
     std::string querySQL = "select * from " + tblName + " where key like " + "'" + pinyin + "%' and key >= '" + pinyin + "a' and key <= '" + pinyin + "z' and length(key) == 2 order by weight desc limit 50";
     // std::cout << querySQL << '\n';
     int result;
@@ -327,7 +331,12 @@ std::vector<std::pair<std::string, long>> queryOneChar(sqlite3* db, std::string 
     int itemCount = 0;
     UserData userData{itemCount, resVec};
     // 查询
+    // result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "single 执行时间: " << duration << " 毫秒" << std::endl;
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result) {
         // Todo: 日志
@@ -841,8 +850,10 @@ std::vector<std::pair<std::string, long>> queryFourteenChars(sqlite3* db, std::s
     所有查询的分页
 */
 std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string pinyin) {
+    // auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
-    std::vector<std::pair<std::string, long>> noPagedVec = queryPinyin(db, pinyin);
+    // std::vector<std::pair<std::string, long>> noPagedVec = queryPinyin(db, pinyin);
+    std::vector<std::pair<std::string, long>> noPagedVec;
     int pinyinSize = pinyin.size();
     if (pinyinSize == 1) {
         noPagedVec = queryOneChar(db, pinyin);
@@ -882,7 +893,12 @@ std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3*
         noPagedVec = queryFourChars(db, pinyin);
     }
     // 分页
+
     doPageVector(pagedVec, noPagedVec);
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "page 执行时间: " << duration << " 毫秒" << std::endl;
     return pagedVec;
 }
 

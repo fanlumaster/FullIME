@@ -1,5 +1,7 @@
 #include "./key_handle_func_lib.h"
 
+#include <chrono>
+
 #include "./ime_hook.h"
 
 void toggleIMEState() {
@@ -95,7 +97,13 @@ void handleAlphaByChars(char c) {
     charVec.push_back(std::tolower(c));
     // 处理所有符合的字符
     std::string hanKey(charVec.begin(), charVec.end());
+    // auto start = std::chrono::high_resolution_clock::now();
     candidateVec = queryCharsInPage(db, hanKey);
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "query 执行时间: " << duration << " 毫秒" << std::endl;
+
     if (candidateVec.size() > 0) {
         curCandidateVec = candidateVec[0];
     } else {
@@ -103,7 +111,12 @@ void handleAlphaByChars(char c) {
         curCandidateVec.clear();
     }
     // 把当前的候选框给打印出来
+    // start = std::chrono::high_resolution_clock::now();
     printOneDVector(curCandidateVec);
+    // end = std::chrono::high_resolution_clock::now();
+    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "UI 执行时间: " << duration << " 毫秒" << std::endl;
 }
 
 void handleAlphaByChars() {

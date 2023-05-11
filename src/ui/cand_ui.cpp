@@ -17,7 +17,7 @@ INT WM_FANY_SHOWWINDOW = RegisterWindowMessage(TEXT("MyShowWindowMessage"));
 INT WM_FANY_REDRAW = RegisterWindowMessage(TEXT("MyRedrawWindowMessage"));  // 重绘
 
 // 转换字符串
-extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+// extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 // 窗口过程
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
