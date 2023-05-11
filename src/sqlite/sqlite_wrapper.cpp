@@ -899,6 +899,7 @@ std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3*
     // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
     // std::cout << "page 执行时间: " << duration << " 毫秒" << std::endl;
+    noPagedVec.clear();
     return pagedVec;
 }
 

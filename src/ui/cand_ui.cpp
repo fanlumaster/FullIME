@@ -82,6 +82,10 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         MessageBox(NULL, TEXT("End Drawing Error!"), L"error", MB_ICONERROR);
     }
     // 释放资源就不在这里操作了，而是专门在程序结束的时候统一释放
+    // Cleanup();
+    SAFE_RELEASE(g_pDWriteTextFormat);
+    SAFE_RELEASE(g_pBrush);
+    SAFE_RELEASE(g_pRenderTarget);
 }
 
 // 创建资源
@@ -132,15 +136,17 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
     if (charVec.size() == 0) {
         fanyHideWindow(gHwnd);
         return;
-    }
-    std::string pinyinStr(charVec.begin(), charVec.end());
-    wText = L"";
-    wText = wText + converter.from_bytes(pinyinStr + "\n");
-    for (int i = 0; i < myVec.size(); i++) {
-        // std::cout << i + 1 << "." << myVec[i].first << ' ';
-        wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
-        if (i != myVec.size() - 1) {
-            wText += L"\n";
+        // wText = L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
+    } else {
+        std::string pinyinStr(charVec.begin(), charVec.end());
+        wText = L"";
+        wText = wText + converter.from_bytes(pinyinStr + "\n");
+        for (int i = 0; i < myVec.size(); i++) {
+            // std::cout << i + 1 << "." << myVec[i].first << ' ';
+            wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+            if (i != myVec.size() - 1) {
+                wText += L"\n";
+            }
         }
     }
     PostMessage(gHwnd, WM_FANY_REDRAW, 0, 0);

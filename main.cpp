@@ -26,8 +26,11 @@
 #pragma comment(lib, "dwrite.lib")
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+    // 测试是否有内存泄露
+    // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
     UNUSED(hInstance);
-    // UNUSED(hPrevInst);
+    UNUSED(hPrevInstance);
     UNUSED(szCmdLine);
     UNUSED(iCmdShow);  // This param is used
     // create the console

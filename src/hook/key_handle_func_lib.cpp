@@ -99,6 +99,7 @@ void handleAlphaByChars(char c) {
     std::string hanKey(charVec.begin(), charVec.end());
     // auto start = std::chrono::high_resolution_clock::now();
     candidateVec = queryCharsInPage(db, hanKey);
+    std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
     // auto end = std::chrono::high_resolution_clock::now();
     // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
