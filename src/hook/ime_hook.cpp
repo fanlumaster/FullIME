@@ -33,6 +33,20 @@ std::vector<std::string> committedChars;
 // 转换字符串
 std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
+// global variable
+// bool isShiftPressed = false;
+// timer id
+// UINT_PTR timerId = 0;
+// 100 ms
+// const UINT timerTimeout = 100;
+// int LShiftCnt = 0;
+
+// 定时器回调函数
+// VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+//     isShiftPressed = false;
+//     // std::cout << "Timer expired" << std::endl;
+// }
+
 /*
     钩子的逻辑处理
 */
@@ -55,8 +69,28 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 exit(0);
             }
 
+            // if (s->vkCode == VK_LSHIFT) {
+            //     isShiftPressed = true;
+            //     LShiftCnt += 1;
+
+            //     // if (timerId == 0) {
+            //     //     timerId = SetTimer(NULL, 0, timerTimeout, TimerProc);
+            //     // }
+            // }
+
             // 切换中英文的快捷键换成 Ctrl + Space
             if (fCtrlDown && s->vkCode == VK_SPACE) {
+                toggleIMEState();
+                return 1;
+            }
+
+            // if (fShiftDown && s->vkCode == VK_CAPITAL) {
+            //     keybd_event(VK_CAPITAL, 0x3A, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+            //     std::cout << "toggle caps" << '\n';
+            //     return 1;
+            // }
+
+            if (s->vkCode == VK_CAPITAL) {
                 toggleIMEState();
                 return 1;
             }
@@ -76,7 +110,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 */
                 if (s->vkCode == VK_ESCAPE) {
                     handleEsc();
-                    return 1;
+                    break;
+                    // return 1;
                 }
 
                 /*
@@ -323,6 +358,13 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 //     }
                 // }
             } else {
+                // if (s->vkCode == VK_LSHIFT) {
+                //     if (fShiftDown) {
+                //         break;
+                //     } else {
+                //         std::cout << "what?" << '\n';
+                //     }
+                // }
                 // if (fShiftDown) {
                 //     // std::cout << "f shift down" << '\n';
                 //     return 0;
@@ -336,6 +378,13 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 //     return 1;
                 // }
             }
+            // if (GetKeyState(VK_LSHIFT) < 0) {
+            //     if (s->vkCode == VK_F10) {
+            //         std::cout << "f10 pressed with shift" << '\n';
+            //     } else {
+            //         std::cout << "single shift pressed pressed." << '\n';
+            //     }
+            // }
 
             break;
         }
@@ -345,10 +394,30 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
             //     std::cout << "space keyup!!!" << '\n';
             //     return 1;
             // }
+
+            // BOOL fShiftDown = GetAsyncKeyState(VK_SHIFT) & 0x8000;
             // if (s->vkCode == VK_LSHIFT) {
-            //     // std::cout << "keyup!!!" << '\n';
-            //     toggleIMEState();
-            //     return 1;
+            //     if (fShiftDown) {
+            //         if ()
+            //         std::cout << "lshift keyup!!!" << '\n';
+            //         break;
+            //     } else {
+            //         // toggleIMEState();
+            //     }
+            //     break;
+            // }
+            // if (s->vkCode == VK_LSHIFT) {
+            //     // if (timerId != 0) {
+            //     //     KillTimer(NULL, timerId);
+            //     //     timerId = 0;
+            //     // }
+            //     std::cout << "is L shift pressed " << isShiftPressed << '\n';
+            //     std::cout << "is L shift pressed times " << LShiftCnt << '\n';
+            //     LShiftCnt = 0;
+            //     // if (!isShiftPressed) {
+            //     //     std::cout << "LShift pressed" << '\n';
+            //     // }
+            //     // isShiftPressed = false;
             // }
         }
 
