@@ -293,7 +293,8 @@ std::vector<std::vector<std::pair<std::string, long>>> queryMultiPinyinInPage(sq
 int updateItemWeightInDb(sqlite3* db, std::string pinyin, std::string hans, long weight) {
     std::string tblName = "fullpinyinsimple";
     // int curWeight = weight + 10000;
-    int curWeight = weight + 50000;
+    // if ()
+    long curWeight = weight;
     std::string curWeightStr = std::to_string(curWeight);
     std::string updateSQL = "update " + tblName + " set weight = " + curWeightStr + " where key = '" + pinyin + "' and value = '" + hans + "'";
     // std::cout << updateSQL << '\n';

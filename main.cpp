@@ -20,12 +20,14 @@
 #include "./hook/ime_hook.h"
 #include "./sqlite/sqlite_wrapper.h"
 #include "./ui/cand_ui.h"
+#include "./uiaccess.h"
 #include "./utils/caret_helper.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+    PrepareForUIAccess();
     // 测试是否有内存泄露
     // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -54,7 +56,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
     // 初始化小鹤双拼的码表，纯双拼二码
-    std::string dbPath = "../../src/flyciku.db";
+    // std::string dbPath = "../../src/flyciku.db";
+    std::string dbPath = "./db/flyciku.db";
     // sqlPageMap = transTableToMap(dbPath, 8);  // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
     // 初始化 COM
@@ -115,16 +118,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     while (GetMessage(&msg, NULL, 0, 0)) {
         if (msg.message == WM_FANY_HIDEWINDOW) {
             // ShowWindow(gHwnd, SW_HIDE);
-            SetWindowPos(gHwnd, NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            // SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
         } else if (msg.message == WM_FANY_SHOWWINDOW) {
             // ShowWindow(gHwnd, SW_SHOW);
-            SetWindowPos(gHwnd, NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            // SetWindowPos(gHwnd, NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            // SetWindowPos(gHwnd, HWND_DESKTOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
         } else if (msg.message == WM_FANY_REDRAW) {
             // wText = L"ni'hc\n1.还行\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
             std::pair<int, int> candSize = calcCandSize(17, 2);
             // std::pair<int, int> caretPos = fanyGetCaretPos();
             std::pair<int, int> caretPos = getGeneralCaretPos();
-            SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            // SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            // SetWindowPos(gHwnd, HWND_DESKTOP, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
         } else {
             TranslateMessage(&msg);

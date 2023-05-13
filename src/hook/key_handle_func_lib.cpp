@@ -234,7 +234,16 @@ void commitCandidate(char c, int canSize, int cInt) {
     std::string curPinyin(charVec.begin(), charVec.end());
     // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second << '\n';
     // 更新权重
-    updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, curCandidateVec[cInt - 1].second);
+    int index = 0;
+    if (candidateVec[0].size() > 3) {
+        index = 3;
+    } else if (candidateVec[0].size() > 2) {
+        index = 2;
+    } else if (candidateVec[0].size() > 1) {
+        index = 1;
+    }
+    long weight = candidateVec[0][index].second + 1;
+    updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, weight);
 
     // 上屏了之后要把 candidateVec 给清除掉
     // candidateVec.clear();
