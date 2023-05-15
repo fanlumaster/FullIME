@@ -55,6 +55,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
+
+    // 注册一个快捷键
+    if (0 == RegisterHotKey(NULL, 1, MOD_SHIFT, NULL)) {
+        std::cout << "shift activated." << '\n';
+    }
+
     // 初始化小鹤双拼的码表，纯双拼二码
     // std::string dbPath = "../../src/flyciku.db";
     std::string dbPath = "./db/flyciku.db";
@@ -134,6 +140,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             // SetWindowPos(gHwnd, HWND_DESKTOP, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
+        } else if (msg.message == WM_HOTKEY) {
+            if (1 == msg.wParam) {
+                IMEState = !IMEState;
+                if (IMEStateToast == "中") {
+                    IMEStateToast = "英";
+                    candidateVec.clear();
+                    curCandidateVec.clear();
+                } else {
+                    IMEStateToast = "中";
+                }
+                // 展示输入法现在的状态
+                std::cout << IMEStateToast << '\n';
+            }
         } else {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
