@@ -235,12 +235,19 @@ void commitCandidate(char c, int canSize, int cInt) {
     // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second << '\n';
     // 更新权重
     int index = 0;
-    if (candidateVec[0].size() > 3) {
-        index = 3;
-    } else if (candidateVec[0].size() > 2) {
+    // if (candidateVec[0].size() > 3) {
+    //     index = 3;
+    // } else if (candidateVec[0].size() > 2) {
+    //     index = 2;
+    // } else if (candidateVec[0].size() > 1) {
+    //     index = 1;
+    // }
+    if (cInt - 1 > 2) {
         index = 2;
-    } else if (candidateVec[0].size() > 1) {
+    } else if (cInt - 1 > 1) {
         index = 1;
+    } else if (cInt - 1 > 0) {
+        index = 0;
     }
     long weight = candidateVec[0][index].second + 1;
     updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, weight);

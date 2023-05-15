@@ -84,26 +84,6 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 return 1;
             }
 
-            // if (fShiftDown && s->vkCode == VK_CAPITAL) {
-            //     keybd_event(VK_CAPITAL, 0x3A, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-            //     std::cout << "toggle caps" << '\n';
-            //     return 1;
-            // }
-
-            if (s->vkCode == VK_CAPITAL) {
-                toggleIMEState();
-                return 1;
-            }
-            // if (fCtrlDown && s->vkCode == VK_LSHIFT) {
-            //     toggleIMEState();
-            //     return 1;
-            // }
-            // if (s->vkCode == VK_SHIFT) {
-            //     std::cout << "shift detected" << '\n';
-            //     toggleIMEState();
-            //     return 1;
-            // }
-
             if (IMEState) {
                 /*
                     处理 Esc 键
@@ -133,6 +113,16 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 if (s->vkCode == VK_RETURN) {
                     if (charVec.size() > 0) {
                         handleEnterByChars();
+                        return 1;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (s->vkCode == VK_LSHIFT || s->vkCode == VK_RSHIFT) {
+                    if (charVec.size() > 0) {
+                        handleEnterByChars();
+                        toggleIMEState();
                         return 1;
                     } else {
                         break;
