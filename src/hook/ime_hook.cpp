@@ -1,3 +1,6 @@
+/*
+    TODO: Esc 问题有待处理，判定情况是否应继续钩子的调用链
+*/
 #include "./ime_hook.h"
 
 #include "../sqlite/sqlite_wrapper.h"
@@ -64,6 +67,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
             BOOL fShiftDown = GetAsyncKeyState(VK_SHIFT) & 0x8000;
             BOOL fCtrlDown = GetAsyncKeyState(VK_CONTROL) & 0x8000;
             BOOL fAltDown = GetAsyncKeyState(VK_MENU) & 0x8000;
+            BOOL fLWinDown = GetAsyncKeyState(VK_LWIN) & 0x8000;
+            BOOL fRWinDown = GetAsyncKeyState(VK_RWIN) & 0x8000;
 
             if (fCtrlDown && fAltDown && s->vkCode == VK_F9) {
                 exit(0);
@@ -89,9 +94,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     处理 Esc 键
                 */
                 if (s->vkCode == VK_ESCAPE) {
-                    handleEsc();
+                    if (charVec.size() > 0) {
+                        handleEsc();
+                        return 1;
+                    }
                     break;
-                    // return 1;
                 }
 
                 /*
@@ -138,6 +145,9 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         break;
                     }
                     if (fAltDown) {
+                        break;
+                    }
+                    if (fLWinDown || fRWinDown) {
                         break;
                     }
                     if (fCtrlDown && fShiftDown) {
