@@ -102,7 +102,7 @@ void CreateDWResource(HWND hwnd) {
 
     // 初始化字体
     DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn", &g_pDWriteTextFormat);
+    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
 
     // 获取可以绘制的客户区的长方形区域
     RECT rc;

@@ -134,6 +134,16 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 */
                 // 字母键和 [ 符号
                 if (std::isalpha(c) || s->vkCode == VK_OEM_4) {
+                    if (fCtrlDown) {
+                        break;
+                    }
+                    if (fAltDown) {
+                        break;
+                    }
+                    if (fCtrlDown && fShiftDown) {
+                        break;
+                    }
+                    // TODO: 这里其实应该把大写的情况也放入候选框中进行显示
                     if (fShiftDown) {
                         char upperC = std::toupper(c);
                         std::string newStr{upperC};
@@ -333,48 +343,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     }
                     return 1;
                 }
-
-                // 等上面的逻辑都处理结束了，再来看这里的单独的 Shift
-                // if (s->vkCode == VK_LSHIFT) {
-                //     toggleIMEState();
-                //     return 1;
-                // }
-                // if (fShiftDown) {
-                //     // std::cout << "f shift down" << '\n';
-                //     return 0;
-                // } else {
-                //     if (s->vkCode == VK_LSHIFT) {
-                //         toggleIMEState();
-                //     }
-                // }
             } else {
-                // if (s->vkCode == VK_LSHIFT) {
-                //     if (fShiftDown) {
-                //         break;
-                //     } else {
-                //         std::cout << "what?" << '\n';
-                //     }
-                // }
-                // if (fShiftDown) {
-                //     // std::cout << "f shift down" << '\n';
-                //     return 0;
-                // } else {
-                //     if (s->vkCode == VK_LSHIFT) {
-                //         toggleIMEState();
-                //     }
-                // }
-                // if (s->vkCode == VK_LSHIFT) {
-                //     toggleIMEState();
-                //     return 1;
-                // }
             }
-            // if (GetKeyState(VK_LSHIFT) < 0) {
-            //     if (s->vkCode == VK_F10) {
-            //         std::cout << "f10 pressed with shift" << '\n';
-            //     } else {
-            //         std::cout << "single shift pressed pressed." << '\n';
-            //     }
-            // }
 
             break;
         }

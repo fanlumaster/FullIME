@@ -19,6 +19,8 @@ void toggleIMEState() {
 
 void handleEsc() {
     charVec.clear();
+    committedPinyin.clear();
+    committedChars.clear();
     fanyHideWindow(gHwnd);
 }
 
@@ -103,7 +105,7 @@ void handleAlphaByChars(char c) {
     // auto end = std::chrono::high_resolution_clock::now();
     // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
-    // std::cout << "query 执行时间: " << duration << " 毫秒" << std::endl;
+    // std::cout << "Query execution time: " << duration << "ms" << '\n';
 
     if (candidateVec.size() > 0) {
         curCandidateVec = candidateVec[0];
@@ -117,7 +119,7 @@ void handleAlphaByChars(char c) {
     // end = std::chrono::high_resolution_clock::now();
     // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
-    // std::cout << "UI 执行时间: " << duration << " 毫秒" << std::endl;
+    // std::cout << "UI execution time: " << duration << "ms" << '\n';
 }
 
 void handleAlphaByChars() {
