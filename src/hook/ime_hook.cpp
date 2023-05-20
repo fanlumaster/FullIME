@@ -2,7 +2,6 @@
     TODO:
         - 在候选框出现的时候，对标点符号的处理需要注意。
         - 另一件事情，快捷键的处理。在按住 Shift 键之后同时使用鼠标左键，不应触发切换输入法状态的快捷键。
-        - 大写的拼音也应该反映在输入法的候选框中。
         - 输入法候选框位置的问题，边缘位置的处理要解决。
 */
 #include "./ime_hook.h"
@@ -265,7 +264,12 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     if (fShiftDown) {
                         sendStringToCursor(converter.from_bytes("《"));
                     } else {
-                        sendStringToCursor(converter.from_bytes("，"));
+                        if (candidateVec.size() > 1) {
+                            handleSpace();
+                            sendStringToCursor(converter.from_bytes("，"));
+                        } else {
+                            sendStringToCursor(converter.from_bytes("，"));
+                        }
                     }
                     return 1;
                 }
@@ -275,7 +279,12 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     if (fShiftDown) {
                         sendStringToCursor(converter.from_bytes("》"));
                     } else {
-                        sendStringToCursor(converter.from_bytes("。"));
+                        if (candidateVec.size() > 1) {
+                            handleSpace();
+                            sendStringToCursor(converter.from_bytes("。"));
+                        } else {
+                            sendStringToCursor(converter.from_bytes("。"));
+                        }
                     }
                     return 1;
                 }
