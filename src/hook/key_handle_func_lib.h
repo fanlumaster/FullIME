@@ -11,6 +11,8 @@ void handleAlpha(char c);
 // 这是给造词的时候，已经上屏前面的，然后后面的准备的
 void handleAlphaByChars();
 void handleAlphaByChars(char c);
+// 处理有大写的情况
+void handleAlphaByCharsWithCapital(char c);
 
 void handleBackSpace();
 void handleBackSpaceByChars();

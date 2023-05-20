@@ -850,7 +850,11 @@ std::vector<std::pair<std::string, long>> queryFourteenChars(sqlite3* db, std::s
 /*
     所有查询的分页
 */
-std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string pinyin) {
+std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string hankey) {
+    std::string pinyin = hankey;
+    for (char& c : pinyin) {
+        c = std::tolower(c);
+    }
     // auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::vector<std::pair<std::string, long>>> pagedVec;
     // std::vector<std::pair<std::string, long>> noPagedVec = queryPinyin(db, pinyin);

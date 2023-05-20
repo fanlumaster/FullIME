@@ -122,6 +122,36 @@ void handleAlphaByChars(char c) {
     // std::cout << "UI execution time: " << duration << "ms" << '\n';
 }
 
+/*
+    大写的情况
+*/
+void handleAlphaByCharsWithCapital(char c) {
+    charVec.push_back(c);
+    // 处理所有符合的字符
+    std::string hanKey(charVec.begin(), charVec.end());
+    // auto start = std::chrono::high_resolution_clock::now();
+    candidateVec = queryCharsInPage(db, hanKey);
+    // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "Query execution time: " << duration << "ms" << '\n';
+
+    if (candidateVec.size() > 0) {
+        curCandidateVec = candidateVec[0];
+    } else {
+        candidateVec.clear();
+        curCandidateVec.clear();
+    }
+    // 把当前的候选框给打印出来
+    // start = std::chrono::high_resolution_clock::now();
+    printOneDVector(curCandidateVec);
+    // end = std::chrono::high_resolution_clock::now();
+    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // 输出结果
+    // std::cout << "UI execution time: " << duration << "ms" << '\n';
+}
+
 void handleAlphaByChars() {
     // 处理所有符合的字符
     std::string hanKey(charVec.begin(), charVec.end());
