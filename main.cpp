@@ -27,6 +27,7 @@
 #pragma comment(lib, "dwrite.lib")
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+    // Windos topmost
     PrepareForUIAccess();
     // 测试是否有内存泄露
     // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -129,7 +130,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         } else if (msg.message == WM_FANY_SHOWWINDOW) {
             // ShowWindow(gHwnd, SW_SHOW);
             // SetWindowPos(gHwnd, NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-            SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            // SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            // SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            SetWindowPos(gHwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
             // SetWindowPos(gHwnd, HWND_DESKTOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
         } else if (msg.message == WM_FANY_REDRAW) {
             // wText = L"ni'hc\n1.还行\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
@@ -137,7 +140,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             // std::pair<int, int> caretPos = fanyGetCaretPos();
             std::pair<int, int> caretPos = getGeneralCaretPos();
             // SetWindowPos(gHwnd, NULL, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-            SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            // SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            // SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+            SetWindowPos(gHwnd, HWND_TOPMOST, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_ASYNCWINDOWPOS);
             // SetWindowPos(gHwnd, HWND_DESKTOP, caretPos.first, caretPos.second, candSize.first, candSize.second, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
             FanyDrawText(gHwnd, wText);
         } else if (msg.message == WM_HOTKEY) {

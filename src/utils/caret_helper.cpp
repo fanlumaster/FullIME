@@ -107,6 +107,8 @@ std::pair<int, int> getGeneralCaretPos() {
     }
     if (caretPos.first == 0 && caretPos.second == 0) {
         caretPos = getCursorPosBySys();
+        caretPos.first += 20;
+        caretPos.second += 30;
     }
     return caretPos;
 }
