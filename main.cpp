@@ -18,6 +18,7 @@
 #include "./InitConsole.h"
 #include "./flypytblsqlite.h"
 #include "./hook/ime_hook.h"
+#include "./hook/key_handle_func_lib.h"
 #include "./sqlite/sqlite_wrapper.h"
 #include "./ui/cand_ui.h"
 #include "./uiaccess.h"
@@ -147,13 +148,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
             FanyDrawText(gHwnd, wText);
         } else if (msg.message == WM_HOTKEY) {
             if (1 == msg.wParam) {
-                IMEState = !IMEState;
-                if (IMEStateToast == "中") {
-                    IMEStateToast = "英";
-                    candidateVec.clear();
-                    curCandidateVec.clear();
-                } else {
-                    IMEStateToast = "中";
+                if (charVec.size() == 0) {
+                    IMEState = !IMEState;
+                    if (IMEStateToast == "中") {
+                        IMEStateToast = "英";
+                        candidateVec.clear();
+                        curCandidateVec.clear();
+                    } else {
+                        IMEStateToast = "中";
+                    }
+                } else if (charVec.size() > 0) {
+                    handleEnterByChars();
+                    toggleIMEState();
                 }
                 // 展示输入法现在的状态
                 std::cout << IMEStateToast << '\n';

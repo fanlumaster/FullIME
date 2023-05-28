@@ -126,6 +126,7 @@ void handleAlphaByChars(char c) {
     大写的情况
 */
 void handleAlphaByCharsWithCapital(char c) {
+    // 本身 c 就是大写的
     charVec.push_back(c);
     // 处理所有符合的字符
     std::string hanKey(charVec.begin(), charVec.end());

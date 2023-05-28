@@ -10,6 +10,10 @@
 */
 #include "./ime_hook.h"
 
+#include <UIAnimation.h>
+#include <UIAutomationClient.h>
+#include <atlbase.h>
+
 #include "../sqlite/sqlite_wrapper.h"
 #include "../ui/cand_ui.h"
 #include "./key_handle_func_lib.h"
@@ -77,6 +81,15 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
             BOOL fLWinDown = GetAsyncKeyState(VK_LWIN) & 0x8000;
             BOOL fRWinDown = GetAsyncKeyState(VK_RWIN) & 0x8000;
 
+            /*
+                        if (fCtrlDown && fAltDown && s->vkCode == VK_F10) {
+                            // IUIAutomationTextPattern::GetSelection();
+                            CComPtr<IUIAutomation> automation;
+
+                            break;
+                        }
+            */
+
             if (fCtrlDown && fAltDown && s->vkCode == VK_F9) {
                 exit(0);
             }
@@ -133,15 +146,15 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                     }
                 }
 
-                if (s->vkCode == VK_LSHIFT || s->vkCode == VK_RSHIFT) {
-                    if (charVec.size() > 0) {
-                        handleEnterByChars();
-                        toggleIMEState();
-                        return 1;
-                    } else {
-                        break;
-                    }
-                }
+                // if (s->vkCode == VK_LSHIFT || s->vkCode == VK_RSHIFT) {
+                //     if (charVec.size() > 0) {
+                //         handleEnterByChars();
+                //         toggleIMEState();
+                //         return 1;
+                //     } else {
+                //         break;
+                //     }
+                // }
 
                 /*
                     拼音码的处理

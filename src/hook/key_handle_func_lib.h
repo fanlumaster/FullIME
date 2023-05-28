@@ -14,7 +14,7 @@ void handleAlphaByChars(char c);
 // 处理有大写的情况
 void handleAlphaByCharsWithCapital(char c);
 
-void handleBackSpace();
+// void handleBackSpace();
 void handleBackSpaceByChars();
 
 // 处理 Enter 键，直接上屏英文字符串
