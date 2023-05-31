@@ -427,8 +427,8 @@ std::vector<std::pair<std::string, long>> queryFourChars(sqlite3* db, std::strin
     std::string pinyin02 = pinyin.substr(0, 2);  // 切前两个字符
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key = '" + pinyin + "' order by weight desc limit 80";
-    std::string querySQL02 = "select * from " + tblName + " where key ='" + pinyin02 + "' order by weight desc limit 80";
+    std::string querySQL = "select * from " + tblName + " where key = '" + pinyin + "' order by weight desc limit 400";
+    std::string querySQL02 = "select * from " + tblName + " where key ='" + pinyin02 + "' order by weight desc limit 400";
     // std::cout << querySQL << '\n';
     int result;
     char* errMsg = nullptr;

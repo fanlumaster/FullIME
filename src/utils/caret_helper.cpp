@@ -1,5 +1,9 @@
 #include "./caret_helper.h"
 
+#include <iostream>
+
+#include "../hook/ime_hook.h"
+
 /*
     通过 GUIThreadInfo 获取 caret 的坐标
 */
@@ -109,6 +113,16 @@ std::pair<int, int> getGeneralCaretPos() {
         caretPos = getCursorPosBySys();
         caretPos.first += 20;
         caretPos.second += 30;
+    }
+
+    // std::cout << caretPos.first << '\t' << caretPos.second << '\n';
+    // 在我这台 pc 上，这里其实可以根据 x 坐标判断是在哪一块屏幕
+    if (caretPos.first < 3840 && caretPos.second > 1866) {
+        caretPos.second -= 35 + (31 * curCandidateVec.size()) + 5 + 35;
+    }
+
+    if (caretPos.first > 3840 && caretPos.second > 1533) {
+        caretPos.second -= 35 + (31 * curCandidateVec.size()) + 5 + 35;
     }
     return caretPos;
 }

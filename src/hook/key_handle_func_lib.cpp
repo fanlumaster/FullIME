@@ -282,6 +282,7 @@ void commitCandidate(char c, int canSize, int cInt) {
     } else if (cInt - 1 > 0) {
         index = 0;
     }
+    // 我取的应该是所有的查询结果里面的最前面的呀，嗯，暂时又没发现问题了。
     long weight = candidateVec[0][index].second + 1;
     updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, weight);
 
