@@ -229,6 +229,15 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         handleSpace();
                         return 1;
                     }
+                    if (curCandidateVec.empty()) {
+                        std::string hanKey(charVec.begin(), charVec.end());
+                        std::wstring wstr = converter.from_bytes(hanKey);
+                        sendStringToCursor(wstr);
+                        candidateVec.clear();
+                        curCandidateVec.clear();
+                        charVec.clear();
+                        fanyHideWindow(gHwnd);
+                    }
                 }
 
                 /*
@@ -236,6 +245,10 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 */
                 // +
                 if (s->vkCode == VK_OEM_PLUS || s->vkCode == VK_TAB) {
+                    // 快捷键不能占用
+                    if (fCtrlDown) {
+                        break;
+                    }
                     if (s->vkCode == VK_OEM_PLUS && fShiftDown) {
                         sendStringToCursor(converter.from_bytes("+"));
                         return 1;
@@ -253,6 +266,9 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 // -
                 // 同时要处理中文的破折号，——
                 if (s->vkCode == VK_OEM_MINUS) {
+                    if (fCtrlDown) {
+                        break;
+                    }
                     if (candidateVec.size() > 1 && pageNo > 0) {
                         pageNo -= 1;
                         // std::cout << "pageNo: " << pageNo << '\n';

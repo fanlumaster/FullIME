@@ -99,13 +99,13 @@ void handleAlphaByChars(char c) {
     charVec.push_back(std::tolower(c));
     // 处理所有符合的字符
     std::string hanKey(charVec.begin(), charVec.end());
-    auto start = std::chrono::high_resolution_clock::now();
+    // auto start = std::chrono::high_resolution_clock::now();
     candidateVec = queryCharsInPage(db, hanKey);
     // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
-    std::cout << "Query execution time: " << duration << "ms" << '\n';
+    // std::cout << "Query execution time: " << duration << "ms" << '\n';
 
     if (candidateVec.size() > 0) {
         curCandidateVec = candidateVec[0];
@@ -275,11 +275,13 @@ void commitCandidate(char c, int canSize, int cInt) {
     // } else if (candidateVec[0].size() > 1) {
     //     index = 1;
     // }
-    if (cInt - 1 > 2) {
+    // 此处是更新一个更新权重的问题
+    int cIntOfAllCand = 8 * pageNo + cInt;
+    if (cIntOfAllCand - 1 > 2) {
         index = 2;
-    } else if (cInt - 1 > 1) {
+    } else if (cIntOfAllCand - 1 > 1) {
         index = 1;
-    } else if (cInt - 1 > 0) {
+    } else if (cIntOfAllCand - 1 > 0) {
         index = 0;
     }
     // 我取的应该是所有的查询结果里面的最前面的呀，嗯，暂时又没发现问题了。
