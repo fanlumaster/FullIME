@@ -99,13 +99,13 @@ void handleAlphaByChars(char c) {
     charVec.push_back(std::tolower(c));
     // 处理所有符合的字符
     std::string hanKey(charVec.begin(), charVec.end());
-    // auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     candidateVec = queryCharsInPage(db, hanKey);
     // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // 输出结果
-    // std::cout << "Query execution time: " << duration << "ms" << '\n';
+    std::cout << "Query execution time: " << duration << "ms" << '\n';
 
     if (candidateVec.size() > 0) {
         curCandidateVec = candidateVec[0];

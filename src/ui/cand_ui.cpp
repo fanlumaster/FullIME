@@ -1,5 +1,7 @@
 #include "./cand_ui.h"
 
+#include <iostream>
+
 #include "../hook/ime_hook.h"
 
 HWND gHwnd;                                  // 窗口的句柄，提出来作为全局变量，方便后面的处理
@@ -164,6 +166,13 @@ std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
     } else {
         charNum = (charVec.size() + 1) / 2;
     }
+    // std::cout << "first => " << charNum << '\n';
+    for (int i = 0; i < curCandidateVec.size(); i++) {
+        if (curCandidateVec[i].first.length() / 3 > charNum) {
+            charNum = curCandidateVec[i].first.length() / 3;
+        }
+    }
+    // std::cout << "second => " << charNum << '\n';
     std::pair<int, int> size;
     int width = charNum * 24 + 28;
     // we can use array to hard code this
