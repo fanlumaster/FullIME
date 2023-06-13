@@ -56,6 +56,8 @@ std::vector<std::pair<std::string, long>> queryElevenChars(sqlite3* db, std::str
 std::vector<std::pair<std::string, long>> queryTwelveChars(sqlite3* db, std::string pinyin);
 std::vector<std::pair<std::string, long>> queryThirteenChars(sqlite3* db, std::string pinyin);
 std::vector<std::pair<std::string, long>> queryFourteenChars(sqlite3* db, std::string pinyin);
+std::vector<std::pair<std::string, long>> queryFifteenChars(sqlite3* db, std::string pinyin);
+std::vector<std::pair<std::string, long>> querySixteenChars(sqlite3* db, std::string pinyin);
 // 分页，就在这个一个函数里面处理了
 std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3* db, std::string pinyin);
 
