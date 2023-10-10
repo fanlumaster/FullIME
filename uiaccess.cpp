@@ -3,7 +3,8 @@
 #include <tchar.h>
 #include <tlhelp32.h>
 
-static DWORD DuplicateWinloginToken(DWORD dwSessionId, DWORD dwDesiredAccess, PHANDLE phToken) {
+static DWORD DuplicateWinloginToken(DWORD dwSessionId, DWORD dwDesiredAccess,
+                                    PHANDLE phToken) {
     DWORD dwErr;
     PRIVILEGE_SET ps;
 
@@ -19,25 +20,34 @@ static DWORD DuplicateWinloginToken(DWORD dwSessionId, DWORD dwDesiredAccess, PH
             pe.dwSize = sizeof(pe);
             dwErr = ERROR_NOT_FOUND;
 
-            for (bCont = Process32First(hSnapshot, &pe); bCont; bCont = Process32Next(hSnapshot, &pe)) {
+            for (bCont = Process32First(hSnapshot, &pe); bCont;
+                 bCont = Process32Next(hSnapshot, &pe)) {
                 HANDLE hProcess;
 
                 if (0 != _tcsicmp(pe.szExeFile, TEXT("winlogon.exe"))) {
                     continue;
                 }
 
-                hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe.th32ProcessID);
+                hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
+                                       pe.th32ProcessID);
                 if (hProcess) {
                     HANDLE hToken;
                     DWORD dwRetLen, sid;
 
-                    if (OpenProcessToken(hProcess, TOKEN_QUERY | TOKEN_DUPLICATE, &hToken)) {
+                    if (OpenProcessToken(
+                            hProcess, TOKEN_QUERY | TOKEN_DUPLICATE, &hToken)) {
                         BOOL fTcb;
 
                         if (PrivilegeCheck(hToken, &ps, &fTcb) && fTcb) {
-                            if (GetTokenInformation(hToken, TokenSessionId, &sid, sizeof(sid), &dwRetLen) && sid == dwSessionId) {
+                            if (GetTokenInformation(hToken, TokenSessionId,
+                                                    &sid, sizeof(sid),
+                                                    &dwRetLen) &&
+                                sid == dwSessionId) {
                                 bFound = TRUE;
-                                if (DuplicateTokenEx(hToken, dwDesiredAccess, NULL, SecurityImpersonation, TokenImpersonation, phToken)) {
+                                if (DuplicateTokenEx(
+                                        hToken, dwDesiredAccess, NULL,
+                                        SecurityImpersonation,
+                                        TokenImpersonation, phToken)) {
                                     dwErr = ERROR_SUCCESS;
                                 } else {
                                     dwErr = GetLastError();
@@ -67,19 +77,28 @@ static DWORD CreateUIAccessToken(PHANDLE phToken) {
     DWORD dwErr;
     HANDLE hTokenSelf;
 
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE, &hTokenSelf)) {
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE,
+                         &hTokenSelf)) {
         DWORD dwSessionId, dwRetLen;
 
-        if (GetTokenInformation(hTokenSelf, TokenSessionId, &dwSessionId, sizeof(dwSessionId), &dwRetLen)) {
+        if (GetTokenInformation(hTokenSelf, TokenSessionId, &dwSessionId,
+                                sizeof(dwSessionId), &dwRetLen)) {
             HANDLE hTokenSystem;
 
-            dwErr = DuplicateWinloginToken(dwSessionId, TOKEN_IMPERSONATE, &hTokenSystem);
+            dwErr = DuplicateWinloginToken(dwSessionId, TOKEN_IMPERSONATE,
+                                           &hTokenSystem);
             if (ERROR_SUCCESS == dwErr) {
                 if (SetThreadToken(NULL, hTokenSystem)) {
-                    if (DuplicateTokenEx(hTokenSelf, TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_DEFAULT, NULL, SecurityAnonymous, TokenPrimary, phToken)) {
+                    if (DuplicateTokenEx(
+                            hTokenSelf,
+                            TOKEN_QUERY | TOKEN_DUPLICATE |
+                                TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_DEFAULT,
+                            NULL, SecurityAnonymous, TokenPrimary, phToken)) {
                         BOOL bUIAccess = TRUE;
 
-                        if (!SetTokenInformation(*phToken, TokenUIAccess, &bUIAccess, sizeof(bUIAccess))) {
+                        if (!SetTokenInformation(*phToken, TokenUIAccess,
+                                                 &bUIAccess,
+                                                 sizeof(bUIAccess))) {
                             dwErr = GetLastError();
                             CloseHandle(*phToken);
                         }
@@ -111,7 +130,8 @@ static BOOL CheckForUIAccess(DWORD *pdwErr, DWORD *pfUIAccess) {
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
         DWORD dwRetLen;
 
-        if (GetTokenInformation(hToken, TokenUIAccess, pfUIAccess, sizeof(*pfUIAccess), &dwRetLen)) {
+        if (GetTokenInformation(hToken, TokenUIAccess, pfUIAccess,
+                                sizeof(*pfUIAccess), &dwRetLen)) {
             result = TRUE;
         } else {
             *pdwErr = GetLastError();
@@ -140,7 +160,9 @@ DWORD PrepareForUIAccess() {
                 PROCESS_INFORMATION pi;
 
                 GetStartupInfo(&si);
-                if (CreateProcessAsUser(hTokenUIAccess, NULL, GetCommandLine(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+                if (CreateProcessAsUser(hTokenUIAccess, NULL, GetCommandLine(),
+                                        NULL, NULL, FALSE, 0, NULL, NULL, &si,
+                                        &pi)) {
                     CloseHandle(pi.hProcess), CloseHandle(pi.hThread);
                     ExitProcess(0);
                 } else {

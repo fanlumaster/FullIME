@@ -364,6 +364,9 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
 
                 // 顿号
                 if (s->vkCode == VK_OEM_5) {
+                    if (fCtrlDown) {
+                        break; // 这里的作用是不干扰其他快捷键，比如 notion 中的 Ctrl + \ 快捷键
+                    }
                     if (fShiftDown) {
                         sendStringToCursor(converter.from_bytes("|"));
                     } else {
