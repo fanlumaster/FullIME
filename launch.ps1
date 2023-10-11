@@ -23,7 +23,10 @@ cmake -G "Visual Studio 17 2022" -A x64 -S . -B ./build/
 
 if ($LASTEXITCODE -eq 0)
 {
+  # DEBUG version
   cmake --build ./build/ --config DEBUG
+  # RELEASE version
+  # cmake --build ./build/ --config RELEASE
   if ($LASTEXITCODE -eq 0)
   {
     $content = Get-Content -Path "./CMakeLists.txt"

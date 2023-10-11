@@ -1,13 +1,18 @@
+#ifndef UNICODE
+#define UNICODE
+#endif  // !UNICODE
+
 #include "./cand_ui.h"
 
 #include <iostream>
 
 #include "../hook/ime_hook.h"
 
-HWND gHwnd;                                  // 窗口的句柄，提出来作为全局变量，方便后面的处理
+HWND gHwnd;  // 窗口的句柄，提出来作为全局变量，方便后面的处理
 ID2D1Factory *g_pD2DFactory = nullptr;       // 全局的 d2d 工厂
 IDWriteFactory *g_pDWriteFactory = nullptr;  // 全局的 DWrite 工厂
 IDWriteTextFormat *g_pDWriteTextFormat = nullptr;
+IDWriteTextLayout *g_pDWriteLayout;
 ID2D1HwndRenderTarget *g_pRenderTarget = nullptr;  // 全局的 hwndRenderTarget
 ID2D1SolidColorBrush *g_pBrush;                    // 全局的笔刷
 
@@ -16,13 +21,15 @@ std::wstring wText = L"";
 // 自定义消息码
 INT WM_FANY_HIDEWINDOW = RegisterWindowMessage(TEXT("MyHideWindowMessage"));
 INT WM_FANY_SHOWWINDOW = RegisterWindowMessage(TEXT("MyShowWindowMessage"));
-INT WM_FANY_REDRAW = RegisterWindowMessage(TEXT("MyRedrawWindowMessage"));  // 重绘
+INT WM_FANY_REDRAW =
+    RegisterWindowMessage(TEXT("MyRedrawWindowMessage"));  // 重绘
 
 // 转换字符串
 // extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
 // 窗口过程
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
+                         LPARAM lParam) {
     switch (message) {
             // case WM_PAINT:
             // FanyDrawText(hWnd, wText);
@@ -46,20 +53,36 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         我们在重绘的时候，得重新获取一下客户区的信息，以及重新定义一下字体的信息？
         不然，字体的拉伸会导致字体的质量变得很差。
     */
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
+    g_pDWriteFactory->CreateTextFormat(
+        L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL,
+        DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
     // 获取可以绘制的客户区的长方形区域
     RECT rc;
     GetClientRect(hwnd, &rc);
-    g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
+    // g_pD2DFactory->CreateHwndRenderTarget(
+    //     D2D1::RenderTargetProperties(),
+    //     D2D1::HwndRenderTargetProperties(
+    //         hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)),
+    //     &g_pRenderTarget);
 
-    // 清除背景为白色
+    g_pD2DFactory->CreateHwndRenderTarget(
+        D2D1::RenderTargetProperties(
+            D2D1_RENDER_TARGET_TYPE_DEFAULT,
+            D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN,
+                              D2D1_ALPHA_MODE_PREMULTIPLIED)),
+        D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(306, 306),
+                                         D2D1_PRESENT_OPTIONS_IMMEDIATELY),
+        &g_pRenderTarget);
+
     // pRenderTarget->BeginDraw();
+    // 开始绘制
     g_pRenderTarget->BeginDraw();
-    // pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+    // 清除背景为透明，最后一个通道是 alpha 通道，设置为 0 的时候，就是全透明
+    g_pRenderTarget->Clear(D2D1::ColorF(0, 0, 0, 0));
     // 如果想改变输入法候选框的背景颜色，可以在这里修改
     // g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Green));
     // g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
-    g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::LightGreen));
+    // g_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::LightGreen));
 
     // 设置绘制参数
     g_pRenderTarget->SetTransform(D2D1::IdentityMatrix());
@@ -67,15 +90,34 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
 
     // 绘制文本
     // ISO C++11 does not allow conversion from string literal to 'wchar_t *'
-    // wchar_t *szText = L"1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.测试";
-    // std::wstring wText = L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.测试";
+    // wchar_t *szText =
+    // L"1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.测试";
+    // std::wstring wText =
+    // L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.测试";
     wchar_t *szText = const_cast<wchar_t *>(wText.c_str());
 
     RECT rect;
     GetClientRect(hwnd, &rect);
-    D2D1_RECT_F layoutRect = D2D1::RectF(static_cast<FLOAT>(rect.left), static_cast<FLOAT>(rect.top), static_cast<FLOAT>(rect.right), static_cast<FLOAT>(rect.bottom));
-    g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &g_pBrush);
-    g_pRenderTarget->DrawText(szText, wcslen(szText), g_pDWriteTextFormat, layoutRect, g_pBrush);
+    // FLOAT dpiX, dpiY;
+    // dpiX = static_cast<FLOAT>(rect.right - rect.left);
+    // dpiY = static_cast<FLOAT>(rect.bottom - rect.top);
+    // HRESULT createTextLayoutRes =
+    // g_pDWriteFactory->CreateTextLayout(wText.c_str(), wText.length() + 1,
+    // g_pDWriteTextFormat, dpiX, dpiY, &g_pDWriteLayout); if
+    // (SUCCEEDED(createTextLayoutRes)) {
+    //     DWRITE_TEXT_RANGE range;
+    //     range.startPosition = 0;
+    //     range.length = wText.length();
+    //     // g_pDWriteLayout->SetFontSize();
+    // }
+
+    D2D1_RECT_F layoutRect = D2D1::RectF(
+        static_cast<FLOAT>(rect.left), static_cast<FLOAT>(rect.top),
+        static_cast<FLOAT>(rect.right), static_cast<FLOAT>(rect.bottom));
+    g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black),
+                                           &g_pBrush);
+    g_pRenderTarget->DrawText(szText, wcslen(szText), g_pDWriteTextFormat,
+                              layoutRect, g_pBrush);
 
     // 结束绘制
     HRESULT hr = g_pRenderTarget->EndDraw();
@@ -83,8 +125,8 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         // 错误处理
         MessageBox(NULL, TEXT("End Drawing Error!"), L"error", MB_ICONERROR);
     }
-    // 释放资源就不在这里操作了，而是专门在程序结束的时候统一释放
-    // Cleanup();
+    // 释放资源就不在这里操作了，而是专门在程序结束的时候统一释放，这是不行的，必须在这里释放，不然，memory
+    // leak 有你好受的！ Cleanup();
     SAFE_RELEASE(g_pDWriteTextFormat);
     SAFE_RELEASE(g_pBrush);
     SAFE_RELEASE(g_pRenderTarget);
@@ -103,19 +145,36 @@ void CreateDWResource(HWND hwnd) {
     }
 
     // 初始化字体
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
-    g_pDWriteFactory->CreateTextFormat(L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                        reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
+    g_pDWriteFactory->CreateTextFormat(
+        L"微软雅黑", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL,
+        DWRITE_FONT_STRETCH_NORMAL, 16.0f, L"zh-cn", &g_pDWriteTextFormat);
 
     // 获取可以绘制的客户区的长方形区域
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    hr = g_pD2DFactory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)), &g_pRenderTarget);
+    // hr = g_pD2DFactory->CreateHwndRenderTarget(
+    //     D2D1::RenderTargetProperties(),
+    //     D2D1::HwndRenderTargetProperties(
+    //         hwnd, D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top)),
+    //     &g_pRenderTarget);
+
+    g_pD2DFactory->CreateHwndRenderTarget(
+        D2D1::RenderTargetProperties(
+            D2D1_RENDER_TARGET_TYPE_DEFAULT,
+            D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN,
+                              D2D1_ALPHA_MODE_PREMULTIPLIED)),
+        D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(306, 306),
+                                         D2D1_PRESENT_OPTIONS_IMMEDIATELY),
+        &g_pRenderTarget);
 
     if (FAILED(hr)) {
         MessageBox(hwnd, L"Create render target failed!", L"Error", 0);
     }
-    hr = g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red), &g_pBrush);
+    hr = g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Red),
+                                                &g_pBrush);
     if (FAILED(hr)) {
         MessageBox(hwnd, L"Create brush failed!", L"Error", 0);
     }
@@ -138,14 +197,16 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
     if (charVec.size() == 0) {
         fanyHideWindow(gHwnd);
         return;
-        // wText = L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
+        // wText =
+        // L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
     } else {
         std::string pinyinStr(charVec.begin(), charVec.end());
         wText = L"";
         wText = wText + converter.from_bytes(pinyinStr + "\n");
         for (int i = 0; i < myVec.size(); i++) {
             // std::cout << i + 1 << "." << myVec[i].first << ' ';
-            wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+            wText = wText + std::to_wstring(i + 1) + L"." +
+                    converter.from_bytes(myVec[i].first);
             if (i != myVec.size() - 1) {
                 wText += L"\n";
             }
@@ -181,5 +242,8 @@ std::pair<int, int> calcCandSize(int fontSize, int charCnt) {
     int height = 35 + (31 * curCandidateVec.size()) + 5;
     size.first = width;
     size.second = height;
+
+    size.first = 306;
+    size.second = 306;
     return size;
 }

@@ -7,6 +7,7 @@ project(fullcpp VERSION 0.1.0)
 
 # Set C++ compiler flags to use Unicode
 # 这个可以解决 L 前缀的 unicode 字符串的问题，但是由于 VSCode 的原因，似乎有时候这个警告会删一下
+# 而，实际上，我们也可以在代码里面直接添加 UNICODE 的宏。
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_UNICODE /DUNICODE")
 
 # Use unicode versions of functions

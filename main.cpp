@@ -9,6 +9,7 @@
 
 #include <Windows.h>
 #include <d2d1.h>
+#include <dwmapi.h>
 #include <dwrite.h>
 
 #include <cctype>
@@ -23,10 +24,14 @@
 #include "./src/sqlite/sqlite_wrapper.h"
 #include "./src/ui/cand_ui.h"
 #include "./src/utils/caret_helper.h"
+#include "./src/utils/constants.h"
 #include "./uiaccess.h"
 
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
+#pragma comment(lib, "dwmapi.lib")
+
+#define FANY_DEBUG
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
                    int iCmdShow) {
@@ -63,13 +68,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
 
     // 注册一个快捷键
+    // TODO: 让 shift
+    // 快捷键更加纯粹一点，或者，像一个办法，用钩子来实现这种纯粹的切换输入法的快捷键
     if (0 == RegisterHotKey(NULL, 1, MOD_SHIFT, NULL)) {
         std::cout << "shift activated." << '\n';
     }
 
     // 初始化小鹤双拼的码表，纯双拼二码
     // std::string dbPath = "../../src/flyciku.db";
-    std::string dbPath = "./db/flyciku.db";
+    // std::string dbPath = "./db/flyciku.db";
+    std::string dbPath = "./build/Debug/db/flyciku.db";
     // sqlPageMap = transTableToMap(dbPath, 8);  //
     // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
@@ -102,28 +110,34 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // 这个 WS_EX_TOOLWINDOW
     // 是为了去掉任务栏区的图标的，这样它就更像一个输入法窗口了 WS_EX_NOACTIVATE
     // 程序执行之后，窗口不会自动获取焦点
-    gHwnd = CreateWindowEx(WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST |
-                               WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
-                           L"Direct2D",        // window class name
-                           L"Draw Rectangle",  // window caption
-                           WS_POPUP,           // window style
-                           20,                 // 初始的 x 坐标
-                           10,                 // 初始的 y 坐标
-                           78,                 // initial x size
-                           306,                // initial y size
-                           NULL,               // parent window handle
-                           NULL,               // window menu handle
-                           hInstance,          // program instance handle
-                           NULL);              // creation parameters
+    // TODO: 初始化窗口的 initial 尺寸需要结合实际的屏幕的分辨率来具体地去对待
+    gHwnd = CreateWindowEx(
+        WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW |
+            WS_EX_NOACTIVATE,
+        winClass.lpszClassName,  // window class name, must be consistant with
+                                 // winClass.lpszClassName
+        L"FullIME",              // window caption
+        WS_POPUP,                // window style
+        20,                      // 初始的 x 坐标
+        10,                      // 初始的 y 坐标
+        INITIAL_CAND_UI_WIDTH,   // initial x size
+        INITIAL_CAND_UI_HEIGHT,
+        NULL,       // parent window handle
+        NULL,       // window menu handle
+        hInstance,  // program instance handle
+        NULL);      // creation parameters
 
+    MARGINS mar = {-1};
+    DwmExtendFrameIntoClientArea(gHwnd, &mar);
     CreateDWResource(gHwnd);
 
     // 这里可以修改输入法候选框背景的透明度
-    SetLayeredWindowAttributes(gHwnd, 0, 255, LWA_ALPHA);
-
+    // SetLayeredWindowAttributes(gHwnd, 0, 255, LWA_ALPHA);
+    SetLayeredWindowAttributes(gHwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
     // 创建和更新窗口，这是固定操作
     // ShowWindow(hwnd, iCmdShow);
-    ShowWindow(gHwnd, SW_SHOW);
+    // ShowWindow(gHwnd, SW_SHOW);
+    ShowWindow(gHwnd, 1);
     UpdateWindow(gHwnd);
 
     MSG msg;
