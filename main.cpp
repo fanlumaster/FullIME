@@ -127,8 +127,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         hInstance,  // program instance handle
         NULL);      // creation parameters
 
-    MARGINS mar = {-1};
-    DwmExtendFrameIntoClientArea(gHwnd, &mar);
     CreateDWResource(gHwnd);
 
     // 这里可以修改输入法候选框背景的透明度

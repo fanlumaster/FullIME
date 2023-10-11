@@ -1,5 +1,13 @@
 # FullIME
 
+update 2023.10.12.00:51
+
+![](https://i.imgur.com/T5gFzko.png)
+
+绘图更新。
+
+---
+
 基于 Windows hook 机制开发的一款中文输入法。
 
 窗口是基于古老而又高效利落的 Win32 窗口技术。
