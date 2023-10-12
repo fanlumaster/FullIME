@@ -53,3 +53,6 @@ void fanyHideWindow(HWND hWnd);
 
 // 计算新的候选框的 size
 std::pair<int, int> calcCandSize(int fontSize, int charCnt);
+
+// 生产拼音字符串，用于候选框的第一行的拼音展示
+std::wstring producePinyinStr(std::string pinyin);

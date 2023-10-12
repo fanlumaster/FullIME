@@ -70,11 +70,11 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         DWRITE_TEXT_RANGE range;
         range.startPosition = 0;
         range.length = wText.length();
-        g_pDWriteLayout->SetFontSize(18, range);
+        g_pDWriteLayout->SetFontSize(17, range);
 
         g_pBrush->SetColor(
             D2D1::ColorF(32.0f / 255.0f, 32.0f / 255.0f, 32.0f / 255.0f, 1.0f));
-        D2D1_RECT_F rect = D2D1::RectF(0.0f, 0.0f, 118.0f, 222.0f);
+        D2D1_RECT_F rect = D2D1::RectF(0.0f, 0.0f, 118.0f, 212.0f);
         D2D1_ROUNDED_RECT rounded_rect = D2D1::RoundedRect(rect, 8, 8);
         g_pRenderTarget->FillRoundedRectangle(rounded_rect, g_pBrush);
 
@@ -115,7 +115,7 @@ void CreateDWResource(HWND hwnd) {
     std::wstring fontname = L"微软雅黑";
     g_pDWriteFactory->CreateTextFormat(
         fontname.c_str(), NULL, DWRITE_FONT_WEIGHT_NORMAL,
-        DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 10.0f, L"zh-cn",
+        DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn",
         &g_pDWriteTextFormat);
 }
 
@@ -139,7 +139,8 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
         // L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
     } else {
         std::string pinyinStr(charVec.begin(), charVec.end());
-        wText = L"";
+        wText = L""; // 注意，这也是一个全局变量
+        
         wText = wText + converter.from_bytes(pinyinStr + "\n");
         for (int i = 0; i < myVec.size(); i++) {
             // std::cout << i + 1 << "." << myVec[i].first << ' ';
