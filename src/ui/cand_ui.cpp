@@ -66,7 +66,6 @@ void FanyDrawText(HWND hwnd, std::wstring wText) {
         &g_pDWriteLayout);
 
     if (SUCCEEDED(res)) {
-        std::cout << "start drawing" << '\n';
         DWRITE_TEXT_RANGE range;
         range.startPosition = 0;
         range.length = wText.length();
@@ -128,6 +127,24 @@ void Cleanup() {
     SAFE_RELEASE(g_pD2DFactory);
 }
 
+
+std::wstring formatPinyinString(std::wstring pinyin) {
+    std::wstring formattedPinyin = L"";
+
+    int count = 0;
+    for (int i = 0; i < pinyin.length() - 1; i++)
+    {
+        count += 1;
+        formattedPinyin = formattedPinyin + pinyin[i];
+        if (count % 2 == 0)
+        {
+            formattedPinyin += L"'";
+        }
+    }
+    formattedPinyin += pinyin[count];
+    return formattedPinyin;
+}
+
 /*
     在候选框中打印当前的候选项
 */
@@ -139,9 +156,11 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec) {
         // L"ni'hc\n1.你好\n2.世界\n3.毛笔\n4.量子\n5.笔画\n6.竟然\n7.什么\n8.可是";
     } else {
         std::string pinyinStr(charVec.begin(), charVec.end());
-        wText = L""; // 注意，这也是一个全局变量
+        wText = L""; // 注意，这也是一个全局变量，这里要 clear 一下
         
-        wText = wText + converter.from_bytes(pinyinStr + "\n");
+        wText += converter.from_bytes(pinyinStr);
+        wText = formatPinyinString(wText);
+        wText += L"\n";
         for (int i = 0; i < myVec.size(); i++) {
             // std::cout << i + 1 << "." << myVec[i].first << ' ';
             wText = wText + std::to_wstring(i + 1) + L"." +

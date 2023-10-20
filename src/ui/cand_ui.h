@@ -41,6 +41,9 @@ void FanyDrawText(HWND hwnd, std::wstring wText);
 void CreateDWResource(HWND hwnd);
 void Cleanup();
 
+// 将拼音字符串格式化，使之带有单引号分隔
+std::wstring formtPinyinString(std::wstring pinyin);
+
 // 打印一维 vector
 void printOneDVector(std::vector<std::pair<std::string, long>> myVec);
 

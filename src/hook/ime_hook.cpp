@@ -1,7 +1,8 @@
 /*
     TODO:
         - 在候选框出现的时候，对标点符号的处理需要注意。
-        - 另一件事情，快捷键的处理。在按住 Shift 键之后同时使用鼠标左键，不应触发切换输入法状态的快捷键。
+        - 另一件事情，快捷键的处理。在按住 Shift
+   键之后同时使用鼠标左键，不应触发切换输入法状态的快捷键。
         - 输入法候选框位置的问题，边缘位置的处理要解决。
         - 输入法的造词功能还是需要再优化一下的。
         - 候选框的拼音分隔的问题。
@@ -21,7 +22,9 @@
 // 全局变量，用来捕捉键盘的字符
 std::vector<char> charVec;
 // 分页 map
-std::unordered_map<std::string, std::vector<std::vector<std::pair<std::string, long>>>> sqlPageMap;
+std::unordered_map<std::string,
+                   std::vector<std::vector<std::pair<std::string, long>>>>
+    sqlPageMap;
 // 候选字的存储位置
 std::vector<std::vector<std::pair<std::string, long>>> candidateVec;
 // 存储词条的字面量(汉字或者词语)和权重
@@ -56,7 +59,8 @@ std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 // int LShiftCnt = 0;
 
 // 定时器回调函数
-// VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+// VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+// {
 //     isShiftPressed = false;
 //     // std::cout << "Timer expired" << std::endl;
 // }
@@ -73,7 +77,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
             char c = MapVirtualKey(s->vkCode, MAPVK_VK_TO_CHAR);
 
             /*
-                获取 Shift 键的状态，这个在处理一些中文的标点或者字符的时候都是需要的
+                获取 Shift
+               键的状态，这个在处理一些中文的标点或者字符的时候都是需要的
             */
             BOOL fShiftDown = GetAsyncKeyState(VK_SHIFT) & 0x8000;
             BOOL fCtrlDown = GetAsyncKeyState(VK_CONTROL) & 0x8000;
@@ -253,8 +258,10 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                         sendStringToCursor(converter.from_bytes("+"));
                         return 1;
                     }
-                    if (candidateVec.size() > 1 && pageNo < candidateVec.size() - 1) {
-                        // std::cout << "raw pageNo: " << pageNo << '\t' << "raw candSize: " << candidateVec.size() << '\n';
+                    if (candidateVec.size() > 1 &&
+                        pageNo < candidateVec.size() - 1) {
+                        // std::cout << "raw pageNo: " << pageNo << '\t' << "raw
+                        // candSize: " << candidateVec.size() << '\n';
                         pageNo += 1;
                         // std::cout << "pageNo: " << pageNo << '\n';
                         curCandidateVec = candidateVec[pageNo];
@@ -365,7 +372,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
                 // 顿号
                 if (s->vkCode == VK_OEM_5) {
                     if (fCtrlDown) {
-                        break; // 这里的作用是不干扰其他快捷键，比如 notion 中的 Ctrl + \ 快捷键
+                        break;  // 这里的作用是不干扰其他快捷键，比如 notion
+                                // 中的 Ctrl + \ 快捷键
                     }
                     if (fShiftDown) {
                         sendStringToCursor(converter.from_bytes("|"));
@@ -411,35 +419,6 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam) {
         }
 
         case WM_KEYUP: {
-            // if (s->vkCode == VK_SPACE) {
-            //     std::cout << "space keyup!!!" << '\n';
-            //     return 1;
-            // }
-
-            // BOOL fShiftDown = GetAsyncKeyState(VK_SHIFT) & 0x8000;
-            // if (s->vkCode == VK_LSHIFT) {
-            //     if (fShiftDown) {
-            //         if ()
-            //         std::cout << "lshift keyup!!!" << '\n';
-            //         break;
-            //     } else {
-            //         // toggleIMEState();
-            //     }
-            //     break;
-            // }
-            // if (s->vkCode == VK_LSHIFT) {
-            //     // if (timerId != 0) {
-            //     //     KillTimer(NULL, timerId);
-            //     //     timerId = 0;
-            //     // }
-            //     std::cout << "is L shift pressed " << isShiftPressed << '\n';
-            //     std::cout << "is L shift pressed times " << LShiftCnt << '\n';
-            //     LShiftCnt = 0;
-            //     // if (!isShiftPressed) {
-            //     //     std::cout << "LShift pressed" << '\n';
-            //     // }
-            //     // isShiftPressed = false;
-            // }
         }
 
         default:
