@@ -40,6 +40,7 @@ if ($LASTEXITCODE -eq 0)
           $contentInParentheses = $Matches[1]
           $result = -split $contentInParentheses
           $exePath = "./build/DEBUG/" + $result[0] + ".exe"
+          Write-Host "start running..."
           Invoke-Expression $exePath
         }
       }

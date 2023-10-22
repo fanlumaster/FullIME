@@ -22,7 +22,7 @@ include_directories("${CMAKE_SOURCE_DIR}/src")
 # 指定 sqlite dll 和 lib 文件路径
 link_directories("${CMAKE_SOURCE_DIR}/libs/sqlite")
 
-add_executable(fullcpp WIN32 "main.cpp" "./src/ui/cand_ui.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "./src/utils/caret_helper.cpp" "./src/hook/key_handle_func_lib.cpp" "./uiaccess.cpp" "DeclareDPIAware.manifest")
+add_executable(fullcpp WIN32 "main.cpp" "./src/ui/cand_ui.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "./src/utils/caret_helper.cpp" "./src/hook/key_handle_func_lib.cpp" "./uiaccess.cpp" "./Resource.h" "./NotificationIcon.rc" "DeclareDPIAware.manifest")
 
 # add_executable(fullcpp WIN32 "main.cpp" "./src/ui/cand_ui.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "./src/utils/caret_helper.cpp" "./src/hook/key_handle_func_lib.cpp" "./UIAccess.manifest")
 
