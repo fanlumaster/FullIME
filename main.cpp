@@ -40,6 +40,7 @@
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "dwmapi.lib")
 
+// 控制 debug 控制台的显隐
 // #define FANY_DEBUG
 
 //~ start system tray

@@ -49,13 +49,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-void ClearCandUI() {
+void ClearCandUI()
+{
     // 开始绘制
     g_pRenderTarget->BeginDraw();
     // 清除背景为透明，最后一个通道是 alpha 通道，设置为 0 的时候，就是全透明
     g_pRenderTarget->Clear(D2D1::ColorF(0, 0, 0, 0));
     // 结束绘制
     g_pRenderTarget->EndDraw();
+}
+
+// 创建资源
+void CreateDWResource(HWND hwnd)
+{
+    MARGINS mar = {-1};
+    DwmExtendFrameIntoClientArea(gHwnd, &mar);
+    D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &g_pD2DFactory);
+
+    g_pD2DFactory->CreateHwndRenderTarget(
+        D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
+                                     D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)),
+        D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(306, 406), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
+        &g_pRenderTarget);
+    g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.0f, 0.0f, 0.0f), &g_pBrush);
+    g_pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                        reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
+    // std::wstring fontname = L"微软雅黑";
+    std::wstring fontname = L"思源黑体";
+    g_pDWriteFactory->CreateTextFormat(fontname.c_str(), NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL,
+                                       DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn", &g_pDWriteTextFormat);
 }
 
 // 绘制文本
@@ -97,27 +120,6 @@ void FanyDrawText(HWND hwnd, std::wstring wText)
     // SAFE_RELEASE(g_pDWriteTextFormat);
     // SAFE_RELEASE(g_pBrush);
     // SAFE_RELEASE(g_pRenderTarget);
-}
-
-// 创建资源
-void CreateDWResource(HWND hwnd)
-{
-    MARGINS mar = {-1};
-    DwmExtendFrameIntoClientArea(gHwnd, &mar);
-    D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &g_pD2DFactory);
-
-    g_pD2DFactory->CreateHwndRenderTarget(
-        D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
-                                     D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED)),
-        D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(306, 406), D2D1_PRESENT_OPTIONS_IMMEDIATELY),
-        &g_pRenderTarget);
-    g_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(0.0f, 0.0f, 0.0f), &g_pBrush);
-    g_pRenderTarget->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
-    DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
-                        reinterpret_cast<IUnknown **>(&g_pDWriteFactory));
-    std::wstring fontname = L"微软雅黑";
-    g_pDWriteFactory->CreateTextFormat(fontname.c_str(), NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL,
-                                       DWRITE_FONT_STRETCH_NORMAL, 17.0f, L"zh-cn", &g_pDWriteTextFormat);
 }
 
 // 释放资源

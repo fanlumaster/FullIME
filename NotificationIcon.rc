@@ -26,7 +26,8 @@ LANGUAGE 9, 1
 // remains consistent on all systems.
 
 IDI_NOTIFICATIONICON       ICON         "NotificationIcon.ico"
-IDI_CHINESEICON       ICON         "RIME.ico"
+// IDI_CHINESEICON       ICON         "RIME.ico"
+IDI_CHINESEICON       ICON         "CHN.ico"
 IDI_ENGLISHICON       ICON         "ENG.ico"
 
 IDB_PRINTER                BITMAP       "printer.bmp"

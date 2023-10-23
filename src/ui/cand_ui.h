@@ -42,8 +42,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 // 清空候选框页面的绘制
 void ClearCandUI();
 
-void FanyDrawText(HWND hwnd, std::wstring wText);
+// 创建 DirectWrite 的资源
 void CreateDWResource(HWND hwnd);
+
+// 绘制文本
+void FanyDrawText(HWND hwnd, std::wstring wText);
+
 void Cleanup();
 
 // 将拼音字符串格式化，使之带有单引号分隔
