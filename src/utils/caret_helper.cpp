@@ -154,9 +154,9 @@ std::pair<int, int> getGeneralCaretPos()
     if (caretPos.first == 0 && caretPos.second == 0)
     {
         // caretPos = getCursorPosBySys();
-        caretPos = getCenterPointPosOfCurScreen();
-        caretPos.first += 20;
-        caretPos.second += 30;
+        caretPos = getCenterPointPosOfCurScreen(); // 既然是中心点的坐标，那么，就不需要做多余的处理
+        // caretPos.first += 20;
+        // caretPos.second += 30;
     }
 
     // std::cout << caretPos.first << '\t' << caretPos.second << '\n';
