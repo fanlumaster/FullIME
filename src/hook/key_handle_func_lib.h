@@ -22,7 +22,12 @@ void handleEnterByChars();
 
 void commitCandidate(char c, int canSize, int cInt);
 
+// 处理空格键，把当前的第一个选项给上屏，并且，不考虑造词
+void handleSpaceSimply();
+
+// 处理空格键，把当前的第一个选项给上屏
 void handleSpace();
+
 void handleShiftDigit(char c);
 
 void clearCandRelative(std::string curStr, std::string hanKey);

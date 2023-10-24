@@ -1,6 +1,10 @@
 /*
     输入法的默认状态是中文
 */
+
+// 控制 debug 控制台的显隐
+#define FANY_DEBUG
+
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -40,8 +44,6 @@
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "dwmapi.lib")
 
-// 控制 debug 控制台的显隐
-// #define FANY_DEBUG
 
 //~ start system tray
 HINSTANCE g_sysTray_hInst = NULL;
@@ -117,9 +119,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // 初始化小鹤双拼的码表，纯双拼二码
     // std::string dbPath = "../../src/flyciku.db";
     // 如果是发布阶段，就用这个
-    std::string dbPath = "./db/flyciku.db";
+    // std::string dbPath = "./db/flyciku.db";
     // 如果是调试阶段，那么，就用下面这个
-    // std::string dbPath = "./build/Debug/db/flyciku.db";
+    std::string dbPath = "./build/Debug/db/flyciku.db";
     // sqlPageMap = transTableToMap(dbPath, 8);  //
     // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);

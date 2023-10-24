@@ -339,24 +339,21 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             /*
                 处理中文的标点符号
             */
-            // 左书名号和逗号
+            // 中文左书名号和中文逗号
             if (s->vkCode == VK_OEM_COMMA)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("《"));
                 }
                 else
                 {
-                    if (candidateVec.size() > 1)
-                    {
-                        handleSpace();
-                        sendStringToCursor(converter.from_bytes("，"));
-                    }
-                    else
-                    {
-                        sendStringToCursor(converter.from_bytes("，"));
-                    }
+                    sendStringToCursor(converter.from_bytes("，"));
                 }
                 return 1;
             }
@@ -364,21 +361,18 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 右书名号和句号
             if (s->vkCode == VK_OEM_PERIOD)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("》"));
                 }
                 else
                 {
-                    if (candidateVec.size() > 1)
-                    {
-                        handleSpace();
-                        sendStringToCursor(converter.from_bytes("。"));
-                    }
-                    else
-                    {
-                        sendStringToCursor(converter.from_bytes("。"));
-                    }
+                    sendStringToCursor(converter.from_bytes("。"));
                 }
                 return 1;
             }
@@ -386,6 +380,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 分号和冒号
             if (s->vkCode == VK_OEM_1)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("："));
@@ -401,6 +400,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 这里要注意左引号和右引号的处理
             if (s->vkCode == VK_OEM_7)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (quoteFlag == true)
                 {
                     if (fShiftDown)
@@ -430,6 +434,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 问号
             if (s->vkCode == VK_OEM_2)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("？"));
@@ -449,6 +458,12 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
                     break; // 这里的作用是不干扰其他快捷键，比如 notion
                            // 中的 Ctrl + \ 快捷键
                 }
+
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("|"));
@@ -463,6 +478,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 左中括号和花括号
             if (s->vkCode == VK_OEM_4)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("{"));
@@ -477,6 +497,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // 右中括号和花括号
             if (s->vkCode == VK_OEM_6)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("}"));
@@ -491,6 +516,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             // · 这个符号
             if (s->vkCode == VK_OEM_3)
             {
+                if (candidateVec.size() > 1)
+                {
+                    handleSpaceSimply(); // 模拟空格，上屏第一个选项
+                }
+
                 if (fShiftDown)
                 {
                     sendStringToCursor(converter.from_bytes("~"));
@@ -504,6 +534,15 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
         }
         else
         {
+            // 多上一道保险(其实不需要)
+            /*
+                处理 Esc 键
+            */
+            // if (s->vkCode == VK_ESCAPE)
+            // {
+            //     handleEsc();
+            //     break;
+            // }
         }
 
         break;
