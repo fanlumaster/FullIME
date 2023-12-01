@@ -1,8 +1,7 @@
 /*
     TODO:
         - 在候选框出现的时候，对标点符号的处理需要注意。
-        - 另一件事情，快捷键的处理。在按住 Shift
-   键之后同时使用鼠标左键，不应触发切换输入法状态的快捷键。
+        - 另一件事情，快捷键的处理。在按住 Shift 键之后同时使用鼠标左键，不应触发切换输入法状态的快捷键。
         - 输入法候选框位置的问题，边缘位置的处理要解决。
         - 输入法的造词功能还是需要再优化一下的。
         - 候选框的拼音分隔的问题。
@@ -15,7 +14,6 @@
 #include <UIAutomationClient.h>
 #include <atlbase.h>
 
-#include "../sqlite/sqlite_wrapper.h"
 #include "../ui/cand_ui.h"
 #include "./key_handle_func_lib.h"
 

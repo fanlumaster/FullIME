@@ -6,8 +6,6 @@
 
 #include <dwmapi.h>
 
-#include <iostream>
-
 #include "../hook/ime_hook.h"
 
 HWND gHwnd;                            // 窗口的句柄，提出来作为全局变量，方便后面的处理

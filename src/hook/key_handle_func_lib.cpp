@@ -1,7 +1,5 @@
 #include "./key_handle_func_lib.h"
 
-#include <chrono>
-
 #include "./ime_hook.h"
 
 void toggleIMEState()
