@@ -11,8 +11,8 @@
 
 // we need commctrl v6 for LoadIconMetric()
 #pragma comment(                                                                                                       \
-        linker,                                                                                                        \
-            "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
+    linker,                                                                                                            \
+    "/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include <Windows.h>
 #include <d2d1.h>
@@ -24,13 +24,9 @@
 #include <commctrl.h>
 #include <strsafe.h>
 
-#include <cctype>
-#include <codecvt>
-#include <locale>
 #include <string>
 
 #include "./InitConsole.h"
-#include "./flypytblsqlite.h"
 #include "./src/hook/ime_hook.h"
 #include "./src/hook/key_handle_func_lib.h"
 #include "./src/sqlite/sqlite_wrapper.h"
@@ -43,7 +39,6 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "dwmapi.lib")
-
 
 //~ start system tray
 HINSTANCE g_sysTray_hInst = NULL;
@@ -105,12 +100,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 #endif // DEBUG
        // end debug console
 
+    std::cout << "cout test"
+              << "\n";
+
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
 
     // 注册一个快捷键
     // TODO: 让 shift
-    // 快捷键更加纯粹一点，或者，像一个办法，用钩子来实现这种纯粹的切换输入法的快捷键
+    // 快捷键更加纯粹一点，或者，想一个办法，用钩子来实现这种纯粹的切换输入法的快捷键
     if (0 == RegisterHotKey(NULL, 1, MOD_SHIFT, NULL))
     {
         std::cout << "shift activated." << '\n';
