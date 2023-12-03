@@ -6,8 +6,10 @@ ykgdviiidoucgezifuneqiuiwoyebuvidcdenividcmawovfdebvidcdekeuiv(62)
 应该支持多少个字符呢其实我也不知道的你知道吗我真的不知道的课石
 */
 #include "./sqlite_wrapper.h"
+#include "../hook/ime_hook.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 /*
     处理分页
@@ -386,26 +388,8 @@ std::vector<std::pair<std::string, long>> queryOneChar(sqlite3 *db, std::string 
 {
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    // 因为一个以一个字符开头的条目会很多，所以，这里只取单字，并且，只取权重最大的前
-    // 80 个 select * from fullpinyinsimple where key like 'l%' and
-    // length(value) == 1 order by weight desc limit 80 std::string querySQL =
-    // "select * from " + tblName + " where key like " + "'" + pinyin + "%'" + "
-    // and length(value) == 1 order by weight desc limit 80"; select * from
-    // fullpinyinsimple where key like 'l%' and key >= 'la' and key <= 'lz' and
-    // length(key) == 4 order by weight desc limit 80; auto start =
-    // std::chrono::high_resolution_clock::now();
-    /*
-        select * from fullpinyinsimple where key like 'y%' and key >= 'ya' and
-       key <= 'yz' and length(key) == 2 order by weight desc limit 80;
-    */
-    /*
-        SELECT *
-        FROM fullpinyinsimple
-        WHERE key >= 'ya' AND key <= 'yz' AND key LIKE 'y%'
-            AND LENGTH(key) = 2
-        ORDER BY weight DESC
-        LIMIT 80;
-    */
+    // 因为一个以一个字符开头的条目会很多，所以，这里只取单字，并且，只取权重最大的前 80 个
+    // select * from fullpinyinsimple where key >= 'la' and key <= 'lz' and length(key) = 2 limit 80
     std::string querySQL = "select * from " + tblName + " where key >= '" + pinyin + "a' and key <= '" + pinyin +
                            "z' and length(key) = 2 limit 80";
     // std::cout << querySQL << '\n';
@@ -414,16 +398,10 @@ std::vector<std::pair<std::string, long>> queryOneChar(sqlite3 *db, std::string 
     int itemCount = 0;
     UserData userData{itemCount, resVec};
     // 查询
-    // result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback,
-    // &userData, &errMsg);
     result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end
-    // - start).count(); 输出结果 std::cout << "single 执行时间: " << duration
-    // << " 毫秒" << std::endl; std::cout << "itemCnt = " << itemCount << '\n';
     if (result)
     {
-        // Todo: 日志
+        // TODO: 转化成日志
         std::cout << "query error!" << '\n';
     }
     std::sort(resVec.begin(), resVec.end(), comparePairs);
@@ -473,13 +451,14 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
     std::string pinyin02 = pinyin.substr(0, 2); // 切前两个字符
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like '" + pinyin02 + "[" + pinyin01 +
-                           "%' and key >= '" + pinyin02 + "[" + pinyin01 + "a' and key <= '" + pinyin + "[" + pinyin01 +
-                           "z' and length(key) == 5 order by weight desc limit 80";
+    /* std::string querySQL = "select * from " + tblName + " where key like '" + pinyin02 + "[" + pinyin01 + */
+    /*                        "%' and key >= '" + pinyin02 + "[" + pinyin01 + "a' and key <= '" + pinyin + "[" +
+     * pinyin01 + */
+    /*                        "z' and length(key) == 5 order by weight desc limit 80"; */
+
+    std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin02 + "' order by weight desc";
     std::string querySQL02 = "select * from " + tblName + " where key like '" + pinyin + "%' and key >= '" + pinyin +
                              "a' and key <= '" + pinyin + "z' and length(key) == 4 order by weight desc limit 80";
-    std::string querySQL03 =
-        "select * from " + tblName + " where key ='" + pinyin02 + "' order by weight desc limit 80";
     // std::cout << querySQL << '\n';
     int result;
     char *errMsg = nullptr;
@@ -490,7 +469,7 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result)
     {
-        // Todo: 日志
+        // TODO: 日志
         std::cout << "query error!" << '\n';
     }
     // 第二次查询
@@ -502,13 +481,34 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
         std::cout << "query error!" << '\n';
     }
     // 第三次查询
-    result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg);
+    /* result = sqlite3_exec(db, querySQL03.c_str(), queryPinyinCallback, &userData, &errMsg); */
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result)
     {
         // Todo: 日志
         std::cout << "query error!" << '\n';
     }
+
+    // 根据辅助码进行过滤
+    // 过滤出不在键集合中的数据
+    auto cur_it = helpCode3Map.find(pinyin01);
+    if (cur_it != helpCode3Map.end())
+    {
+        std::unordered_set<std::string> cur_set = helpCode3Map.find(pinyin01)->second;
+        // 过滤出长度为一个汉字且在集合中的数据
+        auto isFiltered = [&](const std::pair<std::string, long> &element) {
+            // 检查长度是否为一个汉字
+            if (element.first.size() == 3 || element.first.size() == 4)
+            { // 汉字通常占3个字符
+                // 检查值是否在集合中
+                return cur_set.find(element.first) == cur_set.end();
+            }
+            return false; // 如果长度不是一个汉字，保留元素
+        };
+
+        resVec.erase(std::remove_if(resVec.begin(), resVec.end(), isFiltered), resVec.end());
+    }
+
     return resVec;
 }
 

@@ -32,6 +32,10 @@ bool quoteFlag = true;
 // 数据库
 sqlite3 *db;
 
+// 辅助码
+std::unordered_map<std::string, std::unordered_set<std::string>> helpCode3Map; // 3 码
+std::unordered_map<std::string, std::unordered_set<std::string>> helpCodeMap; // 4 码
+
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
 // bool IMEState = false;
