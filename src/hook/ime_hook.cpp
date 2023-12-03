@@ -177,8 +177,8 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             /*
                 拼音码的处理
             */
-            // 字母键和 [ 符号
-            if (std::isalpha(c) || s->vkCode == VK_OEM_4)
+            // 字母键
+            if (std::isalpha(c))
             {
                 if (fCtrlDown)
                 {
