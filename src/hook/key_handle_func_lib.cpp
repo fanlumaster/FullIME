@@ -24,6 +24,7 @@ void handleEsc()
     charVec.clear();
     committedPinyin.clear();
     committedChars.clear();
+    pageNo = 0; // 页码也要清零
     fanyHideWindow(gHwnd);
 }
 
