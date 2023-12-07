@@ -136,9 +136,9 @@ void handleAlphaByChars(char c)
     candidateVec = queryCharsInPage(db, hanKey);
     // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
     // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    // 输出结果
-    // std::cout << "Query execution time: " << duration << "ms" << '\n';
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end -
+    // start).count(); 输出结果 std::cout << "Query execution time: " << duration
+    // << "ms" << '\n';
 
     if (candidateVec.size() > 0)
     {
@@ -153,9 +153,9 @@ void handleAlphaByChars(char c)
     // start = std::chrono::high_resolution_clock::now();
     printOneDVector(curCandidateVec);
     // end = std::chrono::high_resolution_clock::now();
-    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    // 输出结果
-    // std::cout << "UI execution time: " << duration << "ms" << '\n';
+    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end -
+    // start).count(); 输出结果 std::cout << "UI execution time: " << duration <<
+    // "ms" << '\n';
 }
 
 /*
@@ -171,9 +171,9 @@ void handleAlphaByCharsWithCapital(char c)
     candidateVec = queryCharsInPage(db, hanKey);
     // std::cout << "candidateVec capacity" << candidateVec.capacity() << '\n';
     // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    // 输出结果
-    // std::cout << "Query execution time: " << duration << "ms" << '\n';
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end -
+    // start).count(); 输出结果 std::cout << "Query execution time: " << duration
+    // << "ms" << '\n';
 
     if (candidateVec.size() > 0)
     {
@@ -188,9 +188,9 @@ void handleAlphaByCharsWithCapital(char c)
     // start = std::chrono::high_resolution_clock::now();
     printOneDVector(curCandidateVec);
     // end = std::chrono::high_resolution_clock::now();
-    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    // 输出结果
-    // std::cout << "UI execution time: " << duration << "ms" << '\n';
+    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end -
+    // start).count(); 输出结果 std::cout << "UI execution time: " << duration <<
+    // "ms" << '\n';
 }
 
 void handleAlphaByChars()
@@ -336,7 +336,8 @@ void commitCandidate(char c, int canSize, int cInt)
     sendStringToCursor(wstr);
     // fany: test
     std::string curPinyin(charVec.begin(), charVec.end());
-    // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t' << curCandidateVec[cInt - 1].second <<
+    // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t'
+    // << curCandidateVec[cInt - 1].second <<
     // '\n'; 更新权重
     int index = 0;
     // if (candidateVec[0].size() > 3) {
@@ -460,9 +461,9 @@ void clearCandRelative(std::string curStr, std::string hanKey)
     candidateVec.clear();
     curCandidateVec.clear();
     pageNo = 0;
-    // std::cout << curStr << '\t' << curStr.size() << '\t' << hanKey.size() << '\n';
-    // 要注意，这里一个汉字的 size 是 3! 以及，三码不造字
-    // 候选框的汉字的数量 * 2 小于拼音字符的数量
+    // std::cout << curStr << '\t' << curStr.size() << '\t' << hanKey.size() <<
+    // '\n'; 要注意，这里一个汉字的 size 是 3! 以及，三码不造字 候选框的汉字的数量
+    // * 2 小于拼音字符的数量
     if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.find('[') == std::string::npos)
     {
         committedChars.push_back(curStr);
@@ -489,7 +490,8 @@ void clearCandRelative(std::string curStr, std::string hanKey)
             //     preInsertPinyin += eachPinyin;
             // }
             // std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
-            // TODO: 插入新的条目，这里应该插入完整的拼音，而，像 ruhen -> 如何拿，这是不对的
+            // TODO: 插入新的条目，这里应该插入完整的拼音，而，像 ruhen ->
+            // 如何拿，这是不对的
             insertItem(db, committedPinyin[0], preInsertStr);
             // 清空造词用到的 vector
             committedChars.clear();

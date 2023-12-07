@@ -422,7 +422,8 @@ std::vector<std::pair<std::string, long>> queryTwoChars(sqlite3 *db, std::string
     // 2 order by weight desc limit 80 std::string querySQL = "select * from " +
     // tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) ==
     // 2 order by weight desc limit 80";
-    std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc limit 80";
+    /* std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc limit 80"; */
+    std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc";
     // std::cout << querySQL << '\n';
     int result;
     char *errMsg = nullptr;
@@ -451,15 +452,9 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
     std::string pinyin02 = pinyin.substr(0, 2); // 切前两个字符
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
-    /* std::string querySQL = "select * from " + tblName + " where key like '" + pinyin02 + "[" + pinyin01 + */
-    /*                        "%' and key >= '" + pinyin02 + "[" + pinyin01 + "a' and key <= '" + pinyin + "[" +
-     * pinyin01 + */
-    /*                        "z' and length(key) == 5 order by weight desc limit 80"; */
-
     std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin02 + "' order by weight desc";
     std::string querySQL02 = "select * from " + tblName + " where key like '" + pinyin + "%' and key >= '" + pinyin +
                              "a' and key <= '" + pinyin + "z' and length(key) == 4 order by weight desc limit 80";
-    // std::cout << querySQL << '\n';
     int result;
     char *errMsg = nullptr;
     int itemCount = 0;
@@ -488,7 +483,6 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
         // Todo: 日志
         std::cout << "query error!" << '\n';
     }
-
     // 根据辅助码进行过滤
     // 过滤出不在键集合中的数据
     auto cur_it = helpCode3Map.find(pinyin01);
@@ -508,7 +502,6 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
 
         resVec.erase(std::remove_if(resVec.begin(), resVec.end(), isFiltered), resVec.end());
     }
-
     return resVec;
 }
 

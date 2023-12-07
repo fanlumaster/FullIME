@@ -24,6 +24,8 @@
 #include <commctrl.h>
 #include <strsafe.h>
 
+#include <fstream>
+#include <sstream>
 #include <string>
 
 #include "./InitConsole.h"
@@ -98,10 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // make sure to restore the original so we don't get a crash on close!
     std::cout.rdbuf(sb);
 #endif // DEBUG
-       // end debug console
-
-    std::cout << "cout test"
-              << "\n";
+    // end debug console
 
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
@@ -123,6 +122,41 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // sqlPageMap = transTableToMap(dbPath, 8);  //
     // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
+
+    // 初始化辅助码
+    std::string helpCodePath = "./build/Debug/HelpCode.txt";
+    std::ifstream infile(helpCodePath);
+    std::string line;
+    while (std::getline(infile, line))
+    {
+        std::istringstream iss(line);
+        std::string chinese, letters;
+
+        if (std::getline(iss, chinese, '=') && std::getline(iss, letters))
+        {
+            // 使用等于号后面的一个字母作为键
+            std::string key1 = letters.substr(0, 1);
+            // 使用等于号前面的汉字作为值
+            std::string value = chinese;
+            // 将数据添加到 unordered_map 中
+            helpCode3Map[key1].insert(value);
+
+            // 使用等于号后面的两个字母作为键
+            std::string key2 = letters;
+            // 将数据添加到 unordered_map 中
+            helpCodeMap[key2].insert(value);
+
+            // 使用汉字作为键，后面的两位辅助码作为值
+            helpCodeUsingHanKey[value] = key2;
+        }
+        else
+        {
+            std::cerr << "Error parsing line: " << line << std::endl;
+        }
+    }
+
+    std::cout << "helpCode initialized finished." << std::endl;
+
     // 初始化 COM
     CoInitialize(nullptr); // <-- add this to init COM
     // 创建一个窗口的基本操作

@@ -162,16 +162,74 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec)
     }
     else
     {
+        // TODO: 在这里重新定义一个 vector，如果 myVec
+        // 中的条目可以有辅助码，那么，就把辅助码附到汉字或者短语的后面，作为一种提示
+
         std::string pinyinStr(charVec.begin(), charVec.end());
-        wText = L""; // 注意，这也是一个全局变量，这里要 clear 一下
+        wText = L""; // 注意，这也是一个全局变量，这里要重新初始化为空
 
         wText += converter.from_bytes(pinyinStr);
         wText = formatPinyinString(wText);
         wText += L"\n";
         for (int i = 0; i < myVec.size(); i++)
         {
-            // std::cout << i + 1 << "." << myVec[i].first << ' ';
-            wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+            /* std::cout << myVec[i].first.size() << std::endl; */
+            auto it = helpCodeUsingHanKey.find(myVec[i].first);
+            if (it != helpCodeUsingHanKey.end() && (myVec[i].first.size() == 3 || myVec[i].first.size() == 4))
+            {
+                wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first + " " + it->second);
+            }
+            else if (myVec[i].first.size() >= 6)
+            {
+                std::string helpCode = "";
+                std::string curText = myVec[i].first;
+                int tmpFlag = 1;
+                for (int j = 0; j < curText.size();)
+                {
+                    int cplen = 1;
+                    if ((curText[j] & 0xf8) == 0xf0)
+                    {
+                        cplen = 4;
+                    }
+                    else if ((curText[j] & 0xf0) == 0xe0)
+                    {
+                        cplen = 3;
+                    }
+                    else if ((curText[j] & 0xe0) == 0xc0)
+                    {
+                        cplen = 2;
+                    }
+                    if ((j + cplen) > curText.length())
+                    {
+                        cplen = 1;
+                    }
+                    std::string curHan = curText.substr(j, cplen);
+                    auto it = helpCodeUsingHanKey.find(curHan);
+                    if (it != helpCodeUsingHanKey.end())
+                    {
+                        helpCode += it->second.substr(0, 1);
+                    }
+                    else
+                    {
+                        tmpFlag = 0;
+                        break;
+                    }
+                    j += cplen;
+                }
+                if (tmpFlag)
+                {
+                    wText =
+                        wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first + " " + helpCode);
+                }
+                else
+                {
+                    wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+                }
+            }
+            else
+            {
+                wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+            }
             if (i != myVec.size() - 1)
             {
                 wText += L"\n";
@@ -221,5 +279,6 @@ std::pair<int, int> calcCandSize(int fontSize, int charCnt)
 
     size.first = 306;
     size.second = 406;
+
     return size;
 }

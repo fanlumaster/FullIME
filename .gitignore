@@ -1,7 +1,2 @@
 /build
-/src/draft
-/src/backupciku
-/src/flyciku.db
-/draftUtils
-/draftWin32
-/draftWin32*
+*.db

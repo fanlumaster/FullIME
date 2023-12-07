@@ -27,11 +27,12 @@ extern int pageNo;
 // 左右引号的标志
 extern bool quoteFlag;
 // 数据库
-extern sqlite3* db;
+extern sqlite3 *db;
 
 // 辅助码
 extern std::unordered_map<std::string, std::unordered_set<std::string>> helpCode3Map; // 3 码
-extern std::unordered_map<std::string, std::unordered_set<std::string>> helpCodeMap; // 4 码
+extern std::unordered_map<std::string, std::unordered_set<std::string>> helpCodeMap;  // 4 码
+extern std::unordered_map<std::string, std::string> helpCodeUsingHanKey;              // 汉字作为键
 
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
@@ -42,8 +43,7 @@ extern std::string IMEStateToast;
 extern int CREATE_WORD_FLAG;
 // 造词需要用到的字符串
 extern std::vector<std::string> committedPinyin; // 拼音
-extern std::vector<std::string> committedChars; // 汉字
-
+extern std::vector<std::string> committedChars;  // 汉字
 
 // 转换字符串
 extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -54,4 +54,4 @@ extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 // 钩子处理函数
 LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam);
 // 模拟按下字符串中的每个字符
-void sendStringToCursor(const std::wstring& str);
+void sendStringToCursor(const std::wstring &str);

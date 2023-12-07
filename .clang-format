@@ -1,6 +1,5 @@
----
 BasedOnStyle: Microsoft
 IndentWidth: 4
-
-# 不要给头文件排序
+AccessModifierOffset: -4
+IndentAccessModifiers: true
 SortIncludes: false
