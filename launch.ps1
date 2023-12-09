@@ -29,22 +29,25 @@ if ($LASTEXITCODE -eq 0)
   # cmake --build ./build/ --config RELEASE
   if ($LASTEXITCODE -eq 0)
   {
-    $content = Get-Content -Path "./CMakeLists.txt"
-    foreach($line in $content)
-    {
-      if ($line.StartsWith("add_executable"))
-      {
-        $pattern = "\((.*?)\)"
-        if ($line -match $pattern)
-        {
-          $contentInParentheses = $Matches[1]
-          $result = -split $contentInParentheses
-          $exePath = "./build/DEBUG/" + $result[0] + ".exe"
-          Write-Host "start running..."
-          Invoke-Expression $exePath
-        }
-      }
-    }
+    # $content = Get-Content -Path "./CMakeLists.txt"
+    $exePath = "./build/DEBUG/" + "fullcpp" + ".exe"
+    Write-Host "start running..."
+    Invoke-Expression $exePath
+    # foreach($line in $content)
+    # {
+    #   if ($line.StartsWith("add_executable"))
+    #   {
+    #     $pattern = "\((.*?)\)"
+    #     if ($line -match $pattern)
+    #     {
+    #       $contentInParentheses = $Matches[1]
+    #       $result = -split $contentInParentheses
+    #       $exePath = "./build/DEBUG/" + $result[0] + ".exe"
+    #       Write-Host "start running..."
+    #       Invoke-Expression $exePath
+    #     }
+    #   }
+    # }
   }
 }
 

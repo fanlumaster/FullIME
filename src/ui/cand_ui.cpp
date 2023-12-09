@@ -2,11 +2,11 @@
 #define UNICODE
 #endif // !UNICODE
 
-#include "./cand_ui.h"
-
 #include <dwmapi.h>
 
+#include "./cand_ui.h"
 #include "../hook/ime_hook.h"
+#include "../utils/han_char_util.h"
 
 HWND gHwnd;                            // 窗口的句柄，提出来作为全局变量，方便后面的处理
 ID2D1Factory *g_pD2DFactory = nullptr; // 全局的 d2d 工厂
@@ -173,53 +173,69 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec)
         wText += L"\n";
         for (int i = 0; i < myVec.size(); i++)
         {
-            /* std::cout << myVec[i].first.size() << std::endl; */
-            auto it = helpCodeUsingHanKey.find(myVec[i].first);
-            if (it != helpCodeUsingHanKey.end() && (myVec[i].first.size() == 3 || myVec[i].first.size() == 4))
+            // 单个汉字(utf8)的情况
+            if (myVec[i].first.size() == 3 || myVec[i].first.size() == 4)
             {
-                wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first + " " + it->second);
-            }
-            else if (myVec[i].first.size() >= 6)
-            {
-                std::string helpCode = "";
-                std::string curText = myVec[i].first;
-                int tmpFlag = 1;
-                for (int j = 0; j < curText.size();)
+                auto it = helpCodeUsingHanKey.find(myVec[i].first);
+                if (it != helpCodeUsingHanKey.end())
                 {
-                    int cplen = 1;
-                    if ((curText[j] & 0xf8) == 0xf0)
+                    wText =
+                        wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first + " " + it->second);
+                }
+                else
+                {
+                    wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
+                }
+            }
+            else if (myVec[i].first.size() >= 6) // 短语，多汉字
+            {
+                if (calc_han_count(myVec[i].first) == 2)
+                {
+                    std::string helpCode = "";
+                    std::string curText = myVec[i].first;
+                    // 是否每个汉字的辅助码都存在
+                    int all_han_helpcode_exist_flag = 1;
+                    for (int j = 0; j < curText.size();)
                     {
-                        cplen = 4;
+                        int cplen = 1;
+                        if ((curText[j] & 0xf8) == 0xf0)
+                        {
+                            cplen = 4;
+                        }
+                        else if ((curText[j] & 0xf0) == 0xe0)
+                        {
+                            cplen = 3;
+                        }
+                        else if ((curText[j] & 0xe0) == 0xc0)
+                        {
+                            cplen = 2;
+                        }
+                        if ((j + cplen) > curText.length())
+                        {
+                            cplen = 1;
+                        }
+                        std::string curHan = curText.substr(j, cplen);
+                        auto it = helpCodeUsingHanKey.find(curHan);
+                        if (it != helpCodeUsingHanKey.end())
+                        {
+                            helpCode += it->second.substr(0, 1);
+                        }
+                        else
+                        {
+                            all_han_helpcode_exist_flag = 0;
+                            break;
+                        }
+                        j += cplen;
                     }
-                    else if ((curText[j] & 0xf0) == 0xe0)
+                    if (all_han_helpcode_exist_flag)
                     {
-                        cplen = 3;
-                    }
-                    else if ((curText[j] & 0xe0) == 0xc0)
-                    {
-                        cplen = 2;
-                    }
-                    if ((j + cplen) > curText.length())
-                    {
-                        cplen = 1;
-                    }
-                    std::string curHan = curText.substr(j, cplen);
-                    auto it = helpCodeUsingHanKey.find(curHan);
-                    if (it != helpCodeUsingHanKey.end())
-                    {
-                        helpCode += it->second.substr(0, 1);
+                        wText = wText + std::to_wstring(i + 1) + L"." +
+                                converter.from_bytes(myVec[i].first + " " + helpCode);
                     }
                     else
                     {
-                        tmpFlag = 0;
-                        break;
+                        wText = wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first);
                     }
-                    j += cplen;
-                }
-                if (tmpFlag)
-                {
-                    wText =
-                        wText + std::to_wstring(i + 1) + L"." + converter.from_bytes(myVec[i].first + " " + helpCode);
                 }
                 else
                 {
@@ -237,7 +253,6 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec)
         }
     }
     PostMessage(gHwnd, WM_FANY_REDRAW, 0, 0);
-    // std::cout << '\n';
 }
 
 // 隐藏窗口
