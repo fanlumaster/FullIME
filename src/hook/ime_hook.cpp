@@ -13,6 +13,7 @@
 #include <UIAnimation.h>
 #include <UIAutomationClient.h>
 #include <atlbase.h>
+#include <winuser.h>
 
 #include "../ui/cand_ui.h"
 #include "./key_handle_func_lib.h"
@@ -36,6 +37,7 @@ sqlite3 *db;
 std::unordered_map<std::string, std::unordered_set<std::string>> helpCode3Map; // 3 码
 std::unordered_map<std::string, std::unordered_set<std::string>> helpCodeMap;  // 4 码
 std::unordered_map<std::string, std::string> helpCodeUsingHanKey;              // 汉字作为键
+bool EntireHelpCodeFlag = 0;
 
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
@@ -279,31 +281,62 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
             }
 
             /*
-                处理 + 和 - 翻页
+                处理 + 和 - 和 tab 翻页
             */
-            // +
-            if (s->vkCode == VK_OEM_PLUS || s->vkCode == VK_TAB)
+            // tab
+            if (s->vkCode == VK_TAB)
             {
                 // 快捷键不能占用
                 if (fCtrlDown)
                 {
                     break;
                 }
-                if (s->vkCode == VK_OEM_PLUS && fShiftDown)
+                if (candidateVec.size() > 1 && pageNo == 0)
                 {
-                    sendStringToCursor(converter.from_bytes("+"));
-                    return 1;
+                    EntireHelpCodeFlag = 1;
                 }
                 if (candidateVec.size() > 1 && pageNo < candidateVec.size() - 1)
                 {
-                    // std::cout << "raw pageNo: " << pageNo << '\t' << "raw
-                    // candSize: " << candidateVec.size() << '\n';
                     pageNo += 1;
-                    // std::cout << "pageNo: " << pageNo << '\n';
                     curCandidateVec = candidateVec[pageNo];
                     printOneDVector(curCandidateVec);
                     return 1;
                 }
+                if (pageNo == candidateVec.size() - 1)
+                {
+                    return 1; // 吞掉
+                }
+                sendStringToCursor(converter.from_bytes("\t"));
+            }
+
+            // +
+            if (s->vkCode == VK_OEM_PLUS)
+            {
+                // 快捷键不能占用
+                if (fCtrlDown)
+                {
+                    break;
+                }
+                if (candidateVec.size() > 1 && pageNo < candidateVec.size() - 1)
+                {
+                    pageNo += 1;
+                    curCandidateVec = candidateVec[pageNo];
+                    printOneDVector(curCandidateVec);
+                    return 1;
+                }
+                if (pageNo == candidateVec.size() - 1)
+                {
+                    return 1; // 当前是最后一页，就吞掉
+                }
+                if (fShiftDown)
+                {
+                    sendStringToCursor(converter.from_bytes("+"));
+                }
+                else
+                {
+                    sendStringToCursor(converter.from_bytes("="));
+                }
+                return 1;
             }
 
             // -
@@ -317,12 +350,11 @@ LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam)
                 if (candidateVec.size() > 1 && pageNo > 0)
                 {
                     pageNo -= 1;
-                    // std::cout << "pageNo: " << pageNo << '\n';
                     curCandidateVec = candidateVec[pageNo];
                     printOneDVector(curCandidateVec);
                     return 1;
                 }
-                if (candidateVec.size() >= 1 && pageNo == 0)
+                if (candidateVec.size() >= 1 && pageNo == 0) // 当前是第一页，就吞掉
                 {
                     curCandidateVec = candidateVec[pageNo];
                     printOneDVector(curCandidateVec);
@@ -573,7 +605,6 @@ void sendStringToCursor(const std::wstring &str)
         input.ki.time = 0;
         input.ki.dwFlags = KEYEVENTF_UNICODE;
         SendInput(1, &input, sizeof(INPUT));
-
         input.ki.dwFlags |= KEYEVENTF_KEYUP;
         SendInput(1, &input, sizeof(INPUT));
     }

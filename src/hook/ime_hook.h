@@ -39,6 +39,9 @@ extern std::unordered_map<std::string, std::string> helpCodeUsingHanKey;        
 extern bool IMEState;
 extern std::string IMEStateToast;
 
+// 是否开启完整的辅助码的支持，默认是 0，也就是不支持
+extern bool EntireHelpCodeFlag;
+
 // 造词的标志：0 -> 否，1 -> 是
 extern int CREATE_WORD_FLAG;
 // 造词需要用到的字符串

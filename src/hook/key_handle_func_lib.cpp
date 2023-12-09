@@ -329,24 +329,11 @@ void handleEnterByChars()
 
 void commitCandidate(char c, int canSize, int cInt)
 {
-    // 在控制台打印测试
-    // std::cout << curCandidateVec[cInt - 1].first << '\n';
     // 输送到光标所在的地方
     std::wstring wstr = converter.from_bytes(curCandidateVec[cInt - 1].first);
     sendStringToCursor(wstr);
-    // fany: test
     std::string curPinyin(charVec.begin(), charVec.end());
-    // std::cout << curPinyin << '\t' << curCandidateVec[cInt - 1].first << '\t'
-    // << curCandidateVec[cInt - 1].second <<
-    // '\n'; 更新权重
     int index = 0;
-    // if (candidateVec[0].size() > 3) {
-    //     index = 3;
-    // } else if (candidateVec[0].size() > 2) {
-    //     index = 2;
-    // } else if (candidateVec[0].size() > 1) {
-    //     index = 1;
-    // }
     // 此处是更新一个更新权重的问题
     int cIntOfAllCand = 8 * pageNo + cInt;
     if (cIntOfAllCand - 1 > 2)
@@ -364,15 +351,7 @@ void commitCandidate(char c, int canSize, int cInt)
     // 我取的应该是所有的查询结果里面的最前面的呀，嗯，暂时又没发现问题了。
     long weight = candidateVec[0][index].second + 1;
     updateItemWeightInDb(db, curPinyin, curCandidateVec[cInt - 1].first, weight);
-
-    // 上屏了之后要把 candidateVec 给清除掉
-    // candidateVec.clear();
-    // curCandidateVec.clear();
-    // charVec.clear();
-    // pageNo = 0;
-    // fanyHideWindow(gHwnd);
     std::string curStr = curCandidateVec[cInt - 1].first;
-    // std::string hanKey(charVec.begin(), charVec.end());
     clearCandRelative(curStr, curPinyin);
 }
 
@@ -466,17 +445,24 @@ void clearCandRelative(std::string curStr, std::string hanKey)
     candidateVec.clear();
     curCandidateVec.clear();
     pageNo = 0;
+    EntireHelpCodeFlag = 0; // 完整辅助码支持状态清零
     // 要注意，这里一个汉字的 size 是 3 或者 4!
     // 候选框的 (汉字的数量 * 2) 小于拼音字符的数量
     // 以及，三码不造字、五码也不造字
     // TODO: 目前这里只能插入三个字节的汉字，对于 unicode 表中靠后的一些字暂时没去处理
-    if (calc_han_count(curStr) * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.size() != 5)
+    if (calc_han_count(curStr) * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.size() != 5 && hanKey.size() != 4)
     {
         committedChars.push_back(curStr);
         committedPinyin.push_back(hanKey);
         // 这个擦除以后可以自动把 size 变成缩小后的程度
         charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);
         handleAlphaByChars();
+    }
+    else if (hanKey.size() == 4 && EntireHelpCodeFlag)
+    {
+        // 存储拼音的 vector 也要清掉
+        charVec.clear();
+        fanyHideWindow(gHwnd);
     }
     else
     {
