@@ -456,22 +456,26 @@ void handleShiftDigit(char c)
 }
 
 // 上屏之后的清理候选框相关的参数
+/*
+    上屏之后，有两种情况：
+    - 1、清理原来的状态
+    - 2、造词
+*/
 void clearCandRelative(std::string curStr, std::string hanKey)
 {
     candidateVec.clear();
     curCandidateVec.clear();
     pageNo = 0;
-    // std::cout << curStr << '\t' << curStr.size() << '\t' << hanKey.size() <<
-    // '\n'; 要注意，这里一个汉字的 size 是 3! 以及，三码不造字 候选框的汉字的数量
-    // * 2 小于拼音字符的数量
-    if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.find('[') == std::string::npos)
+    // 要注意，这里一个汉字的 size 是 3 或者 4!
+    // 候选框的 (汉字的数量 * 2) 小于拼音字符的数量
+    // 以及，三码不造字
+    // TODO: 目前这里只能插入三个字节的汉字，对于 unicode 表中靠后的一些字暂时没去处理
+    if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3)
     {
         committedChars.push_back(curStr);
         committedPinyin.push_back(hanKey);
-        // std::cout << "fany here" << '\n';
-        charVec.erase(charVec.begin(),
-                      charVec.begin() + curStr.size() / 3 * 2); // 这个擦除以后可以自动把 size 变成缩小后的程度
-        // charVec.resize(charVec.size() - curStr.size() / 3 * 2);
+        // 这个擦除以后可以自动把 size 变成缩小后的程度
+        charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);
         handleAlphaByChars();
     }
     else
@@ -486,12 +490,12 @@ void clearCandRelative(std::string curStr, std::string hanKey)
             {
                 preInsertStr += eachStr;
             }
-            // for (std::string eachPinyin : committedPinyin) {
-            //     preInsertPinyin += eachPinyin;
-            // }
-            // std::cout << committedPinyin[0] << '\t' << preInsertStr << '\n';
-            // TODO: 插入新的条目，这里应该插入完整的拼音，而，像 ruhen ->
-            // 如何拿，这是不对的
+            // TODO: 插入新的条目，这里应该插入完整的拼音，而，
+            // 像 ruhen -> 如何拿，这是不对的，这种情况通常是因为少了一个字母导致的
+            // 解决方法：1. 可以在插入的时候进行校验。
+            //           如果不是拼音和汉字之间不能成对应的关系的话，就不插入
+            //           2. 可以在这里就进行修正，如果对应不上，而对应不上一定是因为少了一个字母
+            //           怎么把那个缺失的字母给补上呢？
             insertItem(db, committedPinyin[0], preInsertStr);
             // 清空造词用到的 vector
             committedChars.clear();

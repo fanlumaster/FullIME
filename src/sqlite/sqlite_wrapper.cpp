@@ -7,6 +7,7 @@ ykgdviiidoucgezifuneqiuiwoyebuvidcdenividcmawovfdebvidcdekeuiv(62)
 */
 #include "./sqlite_wrapper.h"
 #include "../hook/ime_hook.h"
+#include "../utils/han_char_util.h"
 
 #include <algorithm>
 #include <unordered_set>
@@ -422,7 +423,8 @@ std::vector<std::pair<std::string, long>> queryTwoChars(sqlite3 *db, std::string
     // 2 order by weight desc limit 80 std::string querySQL = "select * from " +
     // tblName + " where key like " + "'" + pinyin + "%'" + " and length(key) ==
     // 2 order by weight desc limit 80";
-    /* std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc limit 80"; */
+    /* std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc limit
+     * 80"; */
     std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin + "' order by weight desc";
     // std::cout << querySQL << '\n';
     int result;
@@ -442,6 +444,7 @@ std::vector<std::pair<std::string, long>> queryTwoChars(sqlite3 *db, std::string
 
 /*
     查询 3 个字符
+    包含了辅助码的情况
     参数：
         pinyin: string
     返回值：vector<vector<pair<string, long>>>
@@ -499,7 +502,6 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
             }
             return false; // 如果长度不是一个汉字，保留元素
         };
-
         resVec.erase(std::remove_if(resVec.begin(), resVec.end(), isFiltered), resVec.end());
     }
     return resVec;
@@ -510,6 +512,8 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
     参数：
         pinyin: string
     返回值：vector<vector<pair<string, long>>>
+    TODO: 需要根据全局的一个 flag 来判断，是否需要使用辅助码，即是否已经按下了 TAB 键进行了翻页
+    + 和 - 翻页不算。
 */
 std::vector<std::pair<std::string, long>> queryFourChars(sqlite3 *db, std::string pinyin)
 {
@@ -535,34 +539,6 @@ std::vector<std::pair<std::string, long>> queryFourChars(sqlite3 *db, std::strin
     }
     // 第二次查询
     result = sqlite3_exec(db, querySQL02.c_str(), queryPinyinCallback, &userData, &errMsg);
-    // std::cout << "itemCnt = " << itemCount << '\n';
-    if (result)
-    {
-        // Todo: 日志
-        std::cout << "query error!" << '\n';
-    }
-    return resVec;
-}
-
-/*
-    查询 4 个字符，辅助码的情况，第三个字符为 [
-    参数：
-        pinyin: string
-    返回值：vector<vector<pair<string, long>>>
-*/
-std::vector<std::pair<std::string, long>> queryFourCharsWithHelper(sqlite3 *db, std::string pinyin)
-{
-    std::vector<std::pair<std::string, long>> resVec;
-    std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key like '" + pinyin + "%' and key >= '" + pinyin +
-                           "a' and key <= '" + pinyin + "z' and length(key) == 5 order by weight desc limit 80";
-    // std::cout << querySQL << '\n';
-    int result;
-    char *errMsg = nullptr;
-    int itemCount = 0;
-    UserData userData{itemCount, resVec};
-    // 查询
-    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result)
     {
@@ -633,35 +609,6 @@ std::vector<std::pair<std::string, long>> queryFiveChars(sqlite3 *db, std::strin
     }
     // 第四次查询
     result = sqlite3_exec(db, querySQL04.c_str(), queryPinyinCallback, &userData, &errMsg);
-    // std::cout << "itemCnt = " << itemCount << '\n';
-    if (result)
-    {
-        // Todo: 日志
-        std::cout << "query error!" << '\n';
-    }
-    return resVec;
-}
-
-/*
-    查询 5 个字符，辅助码的情况，第三个字符是 [
-    参数：
-        pinyin: string
-    返回值：vector<vector<pair<string, long>>>
-*/
-std::vector<std::pair<std::string, long>> queryFiveCharsWithHelper(sqlite3 *db, std::string pinyin)
-{
-    // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
-    std::string pinyin02 = pinyin.substr(0, 2); // 切前两个字符
-    std::vector<std::pair<std::string, long>> resVec;
-    std::string tblName = "fullpinyinsimple";
-    std::string querySQL = "select * from " + tblName + " where key = '" + pinyin + "' order by weight desc limit 80";
-    // std::cout << querySQL << '\n';
-    int result;
-    char *errMsg = nullptr;
-    int itemCount = 0;
-    UserData userData{itemCount, resVec};
-    // 查询
-    result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
     // std::cout << "itemCnt = " << itemCount << '\n';
     if (result)
     {
@@ -1586,25 +1533,11 @@ std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3 
     }
     else if (pinyinSize == 4)
     {
-        if (pinyin[2] == '[')
-        {
-            noPagedVec = queryFourCharsWithHelper(db, pinyin);
-        }
-        else
-        {
-            noPagedVec = queryFourChars(db, pinyin);
-        }
+        noPagedVec = queryFourChars(db, pinyin);
     }
     else if (pinyinSize == 5)
     {
-        if (pinyin[2] == '[')
-        {
-            noPagedVec = queryFiveCharsWithHelper(db, pinyin);
-        }
-        else
-        {
-            noPagedVec = queryFiveChars(db, pinyin);
-        }
+        noPagedVec = queryFiveChars(db, pinyin);
     }
     else if (pinyinSize == 6)
     {
@@ -1652,16 +1585,12 @@ std::vector<std::vector<std::pair<std::string, long>>> queryCharsInPage(sqlite3 
     }
     // 分页
     doPageVector(pagedVec, noPagedVec);
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end
-    // - start).count(); 输出结果 std::cout << "page 执行时间: " << duration <<
-    // " 毫秒" << std::endl;
     noPagedVec.clear();
     return pagedVec;
 }
 
 /*
-    插入一个 item
+    向词库中插入一个 item
 */
 int insertItem(sqlite3 *db, std::string pinyin, std::string hanValue)
 {
@@ -1672,12 +1601,19 @@ int insertItem(sqlite3 *db, std::string pinyin, std::string hanValue)
     std::string insertSQL =
         "insert into " + tblName + " (key, value, weight) values ('" + pinyin + "', '" + hanValue + "', 0)";
 
-    std::cout << insertSQL << '\n';
-
     int result;
     char *errMsg = nullptr;
     int itemCount = 0;
     UserData userData{itemCount, resVec};
+
+    // 插入之前，需要先校验一下拼音(双拼)与汉字的数量是否可以严格对应
+    int han_cnt = calc_han_count(hanValue);
+    if (han_cnt * 2 != pinyin.size())
+    {
+        // 对应不上
+        return 0;
+    }
+
     // 查询
     result = sqlite3_exec(db, querySQL.c_str(), simpleQueryPinyinCallback, &userData, &errMsg);
     if (result != SQLITE_OK)
@@ -1685,15 +1621,16 @@ int insertItem(sqlite3 *db, std::string pinyin, std::string hanValue)
         std::cout << "query error!" << '\n';
     }
 
-    // 检查条件并执行插入操作
+    // 只有当数据库中没有的时候才会插入
     if (userData.itemCount == 0)
     {
         result = sqlite3_exec(db, insertSQL.c_str(), nullptr, nullptr, &errMsg);
         if (result)
         {
-            // Todo: 日志
+            // TODO: 日志，不对，其实不用打日志。需要调试的时候再对点打印
             std::cout << "update error!" << '\n';
         }
+        std::cout << insertSQL << '\n';
         std::cout << "insert success!" << '\n';
     }
     return 0;
