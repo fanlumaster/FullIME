@@ -1,6 +1,6 @@
 #include "./key_handle_func_lib.h"
-
 #include "./ime_hook.h"
+#include "../utils/han_char_util.h"
 
 void toggleIMEState()
 {
@@ -468,9 +468,9 @@ void clearCandRelative(std::string curStr, std::string hanKey)
     pageNo = 0;
     // 要注意，这里一个汉字的 size 是 3 或者 4!
     // 候选框的 (汉字的数量 * 2) 小于拼音字符的数量
-    // 以及，三码不造字
+    // 以及，三码不造字、五码也不造字
     // TODO: 目前这里只能插入三个字节的汉字，对于 unicode 表中靠后的一些字暂时没去处理
-    if (curStr.size() / 3 * 2 < hanKey.size() && hanKey.size() != 3)
+    if (calc_han_count(curStr) * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.size() != 5)
     {
         committedChars.push_back(curStr);
         committedPinyin.push_back(hanKey);

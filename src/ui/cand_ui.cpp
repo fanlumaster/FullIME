@@ -189,7 +189,7 @@ void printOneDVector(std::vector<std::pair<std::string, long>> myVec)
             }
             else if (myVec[i].first.size() >= 6) // 短语，多汉字
             {
-                if (calc_han_count(myVec[i].first) == 2)
+                if (calc_han_count(myVec[i].first) == 2) // 短语辅助码只支持两个汉字
                 {
                     std::string helpCode = "";
                     std::string curText = myVec[i].first;
