@@ -510,7 +510,7 @@ std::vector<std::pair<std::string, long>> queryThreeChars(sqlite3 *db, std::stri
 
 /*
     查询 4 个字符
-    支持辅助码
+    支持完整辅助码
     参数：
         pinyin: string
     返回值：vector<vector<pair<string, long>>>
@@ -585,7 +585,6 @@ std::vector<std::pair<std::string, long>> queryFourChars(sqlite3 *db, std::strin
         // Todo: 日志
         std::cout << "query error!" << '\n';
     }
-
     return resVec;
 } // 你好烦
 
@@ -694,12 +693,23 @@ std::vector<std::pair<std::string, long>> queryFiveChars(sqlite3 *db, std::strin
             newResVec.push_back(pair);
         }
     }
-
     return newResVec;
+}
+
+bool isValidEntireTwoWordsWithHelpCodes(std::string han, std::string engKey)
+{
+    auto cur_it = helpCode3Map.find(engKey);
+    if (cur_it != helpCode3Map.end())
+    {
+        std::unordered_set<std::string> cur_set = helpCode3Map.find(engKey)->second;
+        return cur_set.find(han) != cur_set.end();
+    }
+    return 0;
 }
 
 /*
     查询 6 个字符
+    支持完整辅助码
     参数：
         pinyin: string
     返回值：vector<vector<pair<string, long>>>
@@ -710,6 +720,73 @@ std::vector<std::pair<std::string, long>> querySixChars(sqlite3 *db, std::string
     // std::string pinyin02 = pinyin.substr(0, 1);  // 切第一个字符
     std::string pinyin02 = pinyin.substr(0, 4); // 切前四个字符
     std::string pinyin03 = pinyin.substr(0, 2); // 切前两个字符
+    if (EntireHelpCodeFlag)                     // 完整辅助码
+    {
+        /* pageNo = 0; // 确定使用辅助码之后，这里要将 pageNo 状态归零 */
+        std::vector<std::pair<std::string, long>> resVec;
+        std::string tblName = "fullpinyinsimple";
+        std::string querySQL = "select * from " + tblName + " where key  = '" + pinyin02 + "' order by weight desc";
+        int result;
+        char *errMsg = nullptr;
+        int itemCount = 0;
+        UserData userData{itemCount, resVec};
+        // 查询
+        result = sqlite3_exec(db, querySQL.c_str(), queryPinyinCallback, &userData, &errMsg);
+        if (result)
+        {
+            // Todo: 日志
+            std::cout << "query error!" << '\n';
+        }
+        // 根据辅助码进行过滤
+        // 过滤出不在键集合中的数据
+        auto cur_it = helpCodeMap.find(pinyin03);
+        if (cur_it != helpCodeMap.end())
+        {
+            std::unordered_set<std::string> cur_set = helpCodeMap.find(pinyin03)->second;
+            // 过滤出长度为两个汉字且在集合中的数据
+            auto isFiltered = [&](const std::pair<std::string, long> &element) {
+                // 检查长度是否为两个汉字
+                if (2 == calc_han_count(element.first))
+                { // 汉字通常占3个字符
+                    std::string curText = element.first;
+                    int i = 0;
+                    // 检查值是否在集合中
+                    for (int j = 0; j < curText.size();)
+                    {
+                        int cplen = 1;
+                        if ((curText[j] & 0xf8) == 0xf0)
+                        {
+                            cplen = 4;
+                        }
+                        else if ((curText[j] & 0xf0) == 0xe0)
+                        {
+                            cplen = 3;
+                        }
+                        else if ((curText[j] & 0xe0) == 0xc0)
+                        {
+                            cplen = 2;
+                        }
+                        if ((j + cplen) > curText.length())
+                        {
+                            cplen = 1;
+                        }
+                        std::string curHan = curText.substr(j, cplen);
+                        // 只要有一个不满足，就抹去
+                        if (!isValidEntireTwoWordsWithHelpCodes(curHan, pinyin.substr(i + 4, 1)))
+                        {
+                            return true;
+                        }
+                        j += cplen;
+                        i += 1;
+                    }
+                    return false; // 不抹去
+                }
+                return true; // 如果长度不是两个汉字，去除元素
+            };
+            resVec.erase(std::remove_if(resVec.begin(), resVec.end(), isFiltered), resVec.end());
+        }
+        return resVec;
+    }
     std::vector<std::pair<std::string, long>> resVec;
     std::string tblName = "fullpinyinsimple";
     std::string querySQL = "select * from " + tblName + " where key = '" + pinyin + "' order by weight desc limit 80";

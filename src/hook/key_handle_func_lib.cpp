@@ -445,12 +445,12 @@ void clearCandRelative(std::string curStr, std::string hanKey)
     candidateVec.clear();
     curCandidateVec.clear();
     pageNo = 0;
-    EntireHelpCodeFlag = 0; // 完整辅助码支持状态清零
     // 要注意，这里一个汉字的 size 是 3 或者 4!
     // 候选框的 (汉字的数量 * 2) 小于拼音字符的数量
     // 以及，三码不造字、五码也不造字
     // TODO: 目前这里只能插入三个字节的汉字，对于 unicode 表中靠后的一些字暂时没去处理
-    if (calc_han_count(curStr) * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.size() != 5 && hanKey.size() != 4)
+    if (calc_han_count(curStr) * 2 < hanKey.size() && hanKey.size() != 3 && hanKey.size() != 5 && hanKey.size() != 4 &&
+        hanKey.size() != 6)
     {
         committedChars.push_back(curStr);
         committedPinyin.push_back(hanKey);
@@ -458,11 +458,43 @@ void clearCandRelative(std::string curStr, std::string hanKey)
         charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);
         handleAlphaByChars();
     }
-    else if (hanKey.size() == 4 && EntireHelpCodeFlag)
+    else if (hanKey.size() == 4)
     {
-        // 存储拼音的 vector 也要清掉
-        charVec.clear();
-        fanyHideWindow(gHwnd);
+        // 如果开启了单字完整辅助码，那么，候选框就不是造字模式
+        if (EntireHelpCodeFlag)
+        {
+            // 存储拼音的 vector 也要清掉
+            charVec.clear();
+            fanyHideWindow(gHwnd);
+        }
+        else
+        {
+            committedChars.push_back(curStr);
+            committedPinyin.push_back(hanKey);
+            // 这个擦除以后可以自动把 size 变成缩小后的程度
+            charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);
+            handleAlphaByChars();
+        }
+    }
+    else if (hanKey.size() == 6)
+    {
+        std::cout << "fany fuck" << '\n';
+        // 如果开启了双字字完整辅助码，那么，候选框就不是造字模式
+        if (EntireHelpCodeFlag)
+        {
+            std::cout << "fany the fuck" << '\n';
+            // 存储拼音的 vector 也要清掉
+            charVec.clear();
+            fanyHideWindow(gHwnd);
+        }
+        else
+        {
+            committedChars.push_back(curStr);
+            committedPinyin.push_back(hanKey);
+            // 这个擦除以后可以自动把 size 变成缩小后的程度
+            charVec.erase(charVec.begin(), charVec.begin() + curStr.size() / 3 * 2);
+            handleAlphaByChars();
+        }
     }
     else
     {
@@ -491,4 +523,6 @@ void clearCandRelative(std::string curStr, std::string hanKey)
         charVec.clear();
         fanyHideWindow(gHwnd);
     }
+    // 这一切都结束后
+    EntireHelpCodeFlag = 0; // 完整辅助码支持状态清零
 }
