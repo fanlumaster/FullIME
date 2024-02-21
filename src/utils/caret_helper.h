@@ -18,6 +18,11 @@ std::pair<int, int> getCaretPosByGUIThreadInfo();
 std::pair<int, int> getCaretPosByAcc();
 
 /*
+    通过 IUIAutomation 的方式来获取 caret 的坐标
+*/
+std::pair<int, int> GetCaretPosByIUIAutomation();
+
+/*
     通过系统函数获取 cursor 坐标
 */
 std::pair<int, int> getCursorPosBySys();

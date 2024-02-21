@@ -1,8 +1,13 @@
-#include "./caret_helper.h"
-
 #include <iostream>
-
+#include "./caret_helper.h"
 #include "../hook/ime_hook.h"
+
+#include <UIAutomation.h>
+#include <atlbase.h>
+#include <atlsafe.h>
+#include <oleacc.h>
+
+#pragma comment(lib, "Oleacc.lib")
 
 /*
     通过 GUIThreadInfo 获取 caret 的坐标
@@ -106,6 +111,161 @@ std::pair<int, int> getCursorPosBySys()
     return cursorPos;
 }
 
+/*
+    通过 IUIAutomation 的方式来获取 caret 的坐标
+*/
+std::pair<int, int> GetCaretPosByIUIAutomation()
+{
+    std::pair<int, int> caretPos(0, 0);
+    long curX = 0, curY = 0, curW = 0, curH = 0;
+    long *pX = &curX;
+    long *pY = &curY;
+    long *pW = &curW;
+    long *pH = &curH;
+    caretPos.first = static_cast<int>(*pX + *pW);
+    caretPos.second = static_cast<int>(*pY + *pH);
+    CComPtr<IUIAutomation> uia;
+    CComPtr<IUIAutomationElement> eleFocus;
+    CComPtr<IUIAutomationValuePattern> valuePattern;
+    if (S_OK != uia.CoCreateInstance(CLSID_CUIAutomation) || uia == nullptr)
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    if (S_OK != uia->GetFocusedElement(&eleFocus) || eleFocus == nullptr)
+    {
+        goto useAccLocation;
+    }
+    if (S_OK == eleFocus->GetCurrentPatternAs(UIA_ValuePatternId, IID_PPV_ARGS(&valuePattern)) &&
+        valuePattern != nullptr)
+    {
+        BOOL isReadOnly;
+        if (S_OK == valuePattern->get_CurrentIsReadOnly(&isReadOnly) && isReadOnly)
+        {
+            caretPos.first = *pX + *pW;
+            caretPos.second = *pY + *pH;
+            return caretPos;
+        }
+    }
+useAccLocation:
+    // use IAccessible::accLocation
+    GUITHREADINFO guiThreadInfo = {sizeof(guiThreadInfo)};
+    HWND hwndFocus = GetForegroundWindow();
+    GetGUIThreadInfo(GetWindowThreadProcessId(hwndFocus, nullptr), &guiThreadInfo);
+    hwndFocus = guiThreadInfo.hwndFocus ? guiThreadInfo.hwndFocus : hwndFocus;
+    CComPtr<IAccessible> accCaret;
+    if (S_OK == AccessibleObjectFromWindow(hwndFocus, OBJID_CARET, IID_PPV_ARGS(&accCaret)) && accCaret != nullptr)
+    {
+        CComVariant varChild = CComVariant(0);
+        if (S_OK == accCaret->accLocation(pX, pY, pW, pH, varChild))
+        {
+            caretPos.first = *pX + *pW;
+            caretPos.second = *pY + *pH;
+            return caretPos;
+        }
+    }
+    if (eleFocus == nullptr)
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    // use IUIAutomationTextPattern2::GetCaretRange
+    CComPtr<IUIAutomationTextPattern2> textPattern2;
+    CComPtr<IUIAutomationTextRange> caretTextRange;
+    CComSafeArray<double> rects;
+    void *pVal = nullptr;
+    BOOL IsActive = FALSE;
+    if (S_OK != eleFocus->GetCurrentPatternAs(UIA_TextPattern2Id, IID_PPV_ARGS(&textPattern2)) ||
+        textPattern2 == nullptr)
+    {
+        goto useGetSelection;
+    }
+    if (S_OK != textPattern2->GetCaretRange(&IsActive, &caretTextRange) || caretTextRange == nullptr || !IsActive)
+    {
+        goto useGetSelection;
+    }
+    if (S_OK == caretTextRange->GetBoundingRectangles(rects.GetSafeArrayPtr()) && rects != nullptr &&
+        SUCCEEDED(SafeArrayLock(rects)) && rects.GetCount() >= 4)
+    {
+        *pX = long(rects[0]);
+        *pY = long(rects[1]);
+        *pW = long(rects[2]);
+        *pH = long(rects[3]);
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+useGetSelection:
+    CComPtr<IUIAutomationTextPattern> textPattern;
+    CComPtr<IUIAutomationTextRangeArray> selectionRangeArray;
+    CComPtr<IUIAutomationTextRange> selectionRange;
+    if (textPattern2 == nullptr)
+    {
+        if (S_OK != eleFocus->GetCurrentPatternAs(UIA_TextPatternId, IID_PPV_ARGS(&textPattern)) ||
+            textPattern == nullptr)
+        {
+            caretPos.first = *pX + *pW;
+            caretPos.second = *pY + *pH;
+            return caretPos;
+        }
+    }
+    else
+    {
+        textPattern = textPattern2;
+    }
+    if (S_OK != textPattern->GetSelection(&selectionRangeArray) || selectionRangeArray == nullptr)
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    int length = 0;
+    if (S_OK != selectionRangeArray->get_Length(&length) || length <= 0)
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    if (S_OK != selectionRangeArray->GetElement(0, &selectionRange) || selectionRange == nullptr)
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    if (S_OK != selectionRange->GetBoundingRectangles(rects.GetSafeArrayPtr()) || rects == nullptr ||
+        FAILED(SafeArrayLock(rects)))
+    {
+        caretPos.first = *pX + *pW;
+        caretPos.second = *pY + *pH;
+        return caretPos;
+    }
+    if (rects.GetCount() < 4)
+    {
+        if (S_OK != selectionRange->ExpandToEnclosingUnit(TextUnit_Character))
+        {
+            caretPos.first = *pX + *pW;
+            caretPos.second = *pY + *pH;
+            return caretPos;
+        }
+        if (S_OK != selectionRange->GetBoundingRectangles(rects.GetSafeArrayPtr()) || rects == nullptr ||
+            FAILED(SafeArrayLock(rects)) || rects.GetCount() < 4)
+        {
+            caretPos.first = *pX + *pW;
+            caretPos.second = *pY + *pH;
+            return caretPos;
+        }
+    }
+    *pX = long(rects[0]);
+    *pY = long(rects[1]);
+    *pW = long(rects[2]);
+    *pH = long(rects[3]);
+    caretPos.first = *pX + *pW;
+    caretPos.second = *pY + *pH;
+    return caretPos;
+}
+
 std::pair<int, int> getCenterPointPosOfCurScreen()
 {
     // 获取当前活动窗口句柄
@@ -150,6 +310,10 @@ std::pair<int, int> getGeneralCaretPos()
     if (caretPos.first == 0 && caretPos.second == 0)
     {
         caretPos = getCaretPosByAcc();
+    }
+    if (caretPos.first == 0 && caretPos.second == 0)
+    {
+        caretPos = GetCaretPosByIUIAutomation();
     }
     if (caretPos.first == 0 && caretPos.second == 0)
     {
