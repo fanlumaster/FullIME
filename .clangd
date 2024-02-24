@@ -1,2 +1,4 @@
 CompileFlags:
   Add: [-Wno-microsoft-goto, -Wno-unused-value, -Wno-nonportable-include-path, -Wno-microsoft-extra-qualification] # ignore some specific warnings
+Diagnostics:
+  UnusedIncludes: None # 忽略 unused includes
