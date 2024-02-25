@@ -2,7 +2,7 @@
     输入法的默认状态是中文
 */
 
-// 控制 debug 控制台的显隐
+// toggle debug console
 #define FANY_DEBUG
 
 #ifndef UNICODE
@@ -18,6 +18,7 @@
 #include <d2d1.h>
 #include <dwmapi.h>
 #include <dwrite.h>
+#include <fstream>
 
 #include "resource.h"
 #include <shellapi.h>
@@ -64,6 +65,7 @@ BOOL ShowLowInkBalloon();
 BOOL ShowNoInkBalloon();
 BOOL ShowPrintJobBalloon();
 BOOL RestoreTooltip();
+
 //~ end system tray
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
@@ -99,9 +101,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     std::cout.rdbuf(sb);
 #endif // DEBUG
        // end debug console
-
-    std::cout << "cout test"
-              << "\n";
 
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
