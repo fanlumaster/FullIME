@@ -109,13 +109,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         std::cout << "shift activated." << '\n';
     }
 
+    std::string dbPath;
+
     // 初始化小鹤双拼的码表，纯双拼二码
-    // std::string dbPath = "../../src/flyciku.db";
     // 如果是发布阶段，就用这个
-    std::string dbPath = "./db/flyciku.db";
+    dbPath = "./db/flyciku.db";
+
+#ifdef FANY_DEBUG
     // 如果是调试阶段，那么，就用下面这个
-    // std::string dbPath = "./build/Debug/db/flyciku.db";
-    // sqlPageMap = transTableToMap(dbPath, 8);  //
+    dbPath = "./build/Debug/db/flyciku.db";
+#endif
     // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
     // 初始化 COM
