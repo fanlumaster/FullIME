@@ -3,7 +3,7 @@
 */
 
 // toggle debug console
-// #define FANY_DEBUG
+#define FANY_DEBUG
 
 #ifndef UNICODE
 #define UNICODE
@@ -69,11 +69,6 @@ BOOL RestoreTooltip();
 //~ end system tray
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-    // Windos topmost
-    // PrepareForUIAccess();
-    // 测试是否有内存泄露
-    // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
     UNUSED(hInstance);
     UNUSED(hPrevInstance);
     UNUSED(szCmdLine);
@@ -100,6 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // end debug console
 #endif // DEBUG
 
+    // 开发测试的时候可以使用这个函数来临时替代 CMakeLists 中的 linker 选项
     // PrepareForUIAccess();
 
     // 设置钩子

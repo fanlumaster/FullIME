@@ -3,12 +3,13 @@
 
 #ifdef _DEBUG
 #include <stdio.h>
-#define dbgstart()                   \
-    do {                             \
-        AllocConsole();              \
-        freopen("CON", "r", stdin);  \
-        freopen("CON", "w", stdout); \
-        freopen("CON", "w", stderr); \
+#define dbgstart()                                                                                                     \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        AllocConsole();                                                                                                \
+        freopen("CON", "r", stdin);                                                                                    \
+        freopen("CON", "w", stdout);                                                                                   \
+        freopen("CON", "w", stderr);                                                                                   \
     } while (0)
 #define dbgend() FreeConsole()
 #define dbg(...) printf(__VA_ARGS__)
