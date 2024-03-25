@@ -3,7 +3,7 @@
 */
 
 // toggle debug console
-#define FANY_DEBUG
+// #define FANY_DEBUG
 
 #ifndef UNICODE
 #define UNICODE
@@ -51,7 +51,7 @@ wchar_t const szWindowClass[] = L"NotificationIconTest";
 wchar_t const szFlyoutWindowClass[] = L"NotificationFlyout";
 
 // Use a guid to uniquely identify our icon
-class __declspec(uuid("9D0B8B92-4E1C-488e-A1E1-2331AFCE2CB5")) FullIMEIcon;
+class __declspec(uuid("9D0B8B92-4E1C-488e-A1E1-2331AFCE2CB6")) FullIMEIcon;
 
 // Forward declarations of functions included in this code module:
 void RegisterWindowClass(PCWSTR pszClassName, PCWSTR pszMenuName, WNDPROC lpfnWndProc);
@@ -70,7 +70,7 @@ BOOL RestoreTooltip();
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
     // Windos topmost
-    PrepareForUIAccess();
+    // PrepareForUIAccess();
     // 测试是否有内存泄露
     // _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
@@ -95,12 +95,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     std::streambuf *sb = std::cout.rdbuf(&ob);
     // do some work here
     printf("IME started successfully!\n");
-    // std::cout << "nShowCmd = " << nShowCmd << std::endl;
-    // std::cout << "Now making my first Windows window!" << std::endl;
     // make sure to restore the original so we don't get a crash on close!
     std::cout.rdbuf(sb);
+    // end debug console
 #endif // DEBUG
-       // end debug console
+
+    // PrepareForUIAccess();
 
     // 设置钩子
     HHOOK kbd = SetWindowsHookEx(WH_KEYBOARD_LL, &KBDHook, 0, 0);
@@ -116,9 +116,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     // 初始化小鹤双拼的码表，纯双拼二码
     // std::string dbPath = "../../src/flyciku.db";
     // 如果是发布阶段，就用这个
-    // std::string dbPath = "./db/flyciku.db";
+    std::string dbPath = "./db/flyciku.db";
     // 如果是调试阶段，那么，就用下面这个
-    std::string dbPath = "./build/Debug/db/flyciku.db";
+    // std::string dbPath = "./build/Debug/db/flyciku.db";
     // sqlPageMap = transTableToMap(dbPath, 8);  //
     // 如果把这个放到钩子函数里面会导致程序很慢的
     db = openSqlite(dbPath);
