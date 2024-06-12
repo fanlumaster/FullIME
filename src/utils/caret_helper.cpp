@@ -261,7 +261,8 @@ useGetSelection:
     *pY = long(rects[1]);
     *pW = long(rects[2]);
     *pH = long(rects[3]);
-    caretPos.first = *pX + *pW;
+    /* caretPos.first = *pX + *pW; */
+    caretPos.first = *pX;
     caretPos.second = *pY + *pH;
     return caretPos;
 }
