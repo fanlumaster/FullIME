@@ -10,6 +10,7 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 
 # include_directories(".")
 include_directories("${CMAKE_SOURCE_DIR}/src")
+include_directories("${CMAKE_SOURCE_DIR}/libs")
 
 # 指定 sqlite3 dll 和 lib 文件路径
 link_directories("${CMAKE_SOURCE_DIR}/libs/sqlite")

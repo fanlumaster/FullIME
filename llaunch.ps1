@@ -1,4 +1,36 @@
+#
 # generate, compile and run exe files
+#
+
+function getExePathFromCMakeLists()
+{
+    $content = Get-Content -Path "./CMakeLists.txt"
+    $lastLine = ""
+    $contentContainedExeName = ""
+    foreach($line in $content)
+    {
+        if ($line.StartsWith("add_executable"))
+        {
+            $index = $line.IndexOf("(")
+            $contentContainedExeName = $line.Substring($index + 1)
+            if ([string]::IsNullOrEmpty($contentContainedExeName))
+            {
+                $lastLine = $line
+                continue
+            }
+            break
+        } elseif ($lastLine.StartsWith("add_executable"))
+        {
+            $contentContainedExeName = $line
+            break
+        }
+        $lastLine = $line
+    }
+    $result = -split $contentContainedExeName
+    $exePath = "./build/DEBUG/" + $result[0] + ".exe"
+    return $exePath
+}
+
 $currentDirectory = Get-Location
 $cmakeListsPath = Join-Path -Path $currentDirectory -ChildPath "CMakeLists.txt"
 
@@ -22,27 +54,12 @@ cmake -G "Visual Studio 17 2022" -A x64 -S . -B ./build/
 
 if ($LASTEXITCODE -eq 0)
 {
-    # DEBUG version
     cmake --build ./build/ --config DEBUG
-    # RELEASE version
-    # cmake --build ./build/ --config RELEASE
     if ($LASTEXITCODE -eq 0)
     {
-        $content = Get-Content -Path "./CMakeLists.txt"
-        foreach($line in $content)
-        {
-            if ($line.StartsWith("add_executable"))
-            {
-                $pattern = "\((.*?)\)"
-                if ($line -match $pattern)
-                {
-                    $contentInParentheses = $Matches[1]
-                    $result = -split $contentInParentheses
-                    $exePath = "./build/DEBUG/" + $result[0] + ".exe"
-                    Write-Host "start running..."
-                    Invoke-Expression $exePath
-                }
-            }
-        }
+        $exePath = getExePathFromCMakeLists
+        Write-Host "start running as follows..."
+        Write-Host "=================================================="
+        Invoke-Expression $exePath
     }
 }

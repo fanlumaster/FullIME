@@ -1,4 +1,7 @@
-# generate and compile exe files
+#
+# generate compile to exe files
+#
+
 $currentDirectory = Get-Location
 $cmakeListsPath = Join-Path -Path $currentDirectory -ChildPath "CMakeLists.txt"
 

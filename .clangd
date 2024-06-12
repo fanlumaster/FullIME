@@ -1,4 +1,12 @@
 CompileFlags:
-  Add: [-Wno-microsoft-goto, -Wno-unused-value, -Wno-nonportable-include-path, -Wno-microsoft-extra-qualification] # ignore some specific warnings
+  Add: [
+    "-std=c++17",
+    "-IC:\\EDisk\\CppCodes\\IME\\IMEByHook\\src", # you should replace this to your own include path of this project
+    "-IC:\\EDisk\\CppCodes\\IME\\IMEByHook\\libs", # you should replace this to your own include path of this project
+    -Wno-microsoft-goto,
+    -Wno-unused-value,
+    -Wno-nonportable-include-path,
+    -Wno-microsoft-extra-qualification
+  ] # ignore some specific warnings
 Diagnostics:
   UnusedIncludes: None # 忽略 unused includes
