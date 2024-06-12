@@ -1,5 +1,5 @@
-#include "../sqlite/sqlite_wrapper.h"
-#include "../ui/cand_ui.h"
+#include "sqlite/sqlite_wrapper.h"
+#include "ui/cand_ui.h"
 
 void toggleIMEState();
 

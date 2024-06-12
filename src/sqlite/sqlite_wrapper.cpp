@@ -5,7 +5,7 @@ yinggaizhichiduoshaogezifunewoyebuzhidaoyanizhidaomakeshiwozhend(64)
 ykgdviiidoucgezifuneqiuiwoyebuvidcdenividcmawovfdebvidcdekeuiv(62)
 应该支持多少个字符呢其实我也不知道的你知道吗我真的不知道的课石
 */
-#include "./sqlite_wrapper.h"
+#include "sqlite/sqlite_wrapper.h"
 
 #include <algorithm>
 

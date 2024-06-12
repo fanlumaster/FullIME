@@ -1,11 +1,12 @@
-#include <iostream>
-#include "./caret_helper.h"
-#include "../hook/ime_hook.h"
+#include "utils/caret_helper.h"
+#include "hook/ime_hook.h"
 
 #include <UIAutomation.h>
 #include <atlbase.h>
 #include <atlsafe.h>
 #include <oleacc.h>
+
+#include <iostream>
 
 #pragma comment(lib, "Oleacc.lib")
 

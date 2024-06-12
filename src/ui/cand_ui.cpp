@@ -2,11 +2,10 @@
 #define UNICODE
 #endif // !UNICODE
 
-#include "./cand_ui.h"
+#include "ui/cand_ui.h"
+#include "hook/ime_hook.h"
 
 #include <dwmapi.h>
-
-#include "../hook/ime_hook.h"
 
 HWND gHwnd;                            // 窗口的句柄，提出来作为全局变量，方便后面的处理
 ID2D1Factory *g_pD2DFactory = nullptr; // 全局的 d2d 工厂

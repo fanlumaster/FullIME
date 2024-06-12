@@ -8,14 +8,14 @@
         - 小狼毫的源码阅读，主要是先上屏一个字符确定光标的位置这里需要去注意。
         - 针对不同的应用程序应该使其有不同的输入法状态控制。
 */
-#include "./ime_hook.h"
+#include "hook/ime_hook.h"
+#include "ui/cand_ui.h"
+#include "hook/key_handle_func_lib.h"
 
 #include <UIAnimation.h>
 #include <UIAutomationClient.h>
 #include <atlbase.h>
 
-#include "../ui/cand_ui.h"
-#include "./key_handle_func_lib.h"
 
 // 全局变量，用来捕捉键盘的字符
 std::vector<char> charVec;

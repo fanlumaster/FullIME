@@ -1,6 +1,5 @@
-#include "./key_handle_func_lib.h"
-
-#include "./ime_hook.h"
+#include "hook/key_handle_func_lib.h"
+#include "hook/ime_hook.h"
 
 void toggleIMEState()
 {

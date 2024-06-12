@@ -15,7 +15,18 @@ include_directories("${CMAKE_SOURCE_DIR}/libs")
 # 指定 sqlite3 dll 和 lib 文件路径
 link_directories("${CMAKE_SOURCE_DIR}/libs/sqlite")
 
-add_executable(fullcpp WIN32 "main.cpp" "./src/ui/cand_ui.cpp" "./src/hook/ime_hook.cpp" "./src/sqlite/sqlite_wrapper.cpp" "./flypytblsqlite.cpp" "./src/utils/caret_helper.cpp" "./src/hook/key_handle_func_lib.cpp" "./uiaccess.cpp" "./Resource.h" "./NotificationIcon.rc")
+add_executable(fullcpp WIN32
+    "main.cpp"
+    "./src/ui/cand_ui.cpp"
+    "./src/hook/ime_hook.cpp"
+    "./src/sqlite/sqlite_wrapper.cpp"
+    "./flypytblsqlite.cpp"
+    "./src/utils/caret_helper.cpp"
+    "./src/hook/key_handle_func_lib.cpp"
+    "./uiaccess.cpp"
+    "./Resource.h"
+    "./NotificationIcon.rc"
+)
 
 # 设置 lib，其实这个也可以在 cpp 文件中使用 #pragma comment(lib, "d2d1") 来声明
 set(LIBS d2d1 sqlite3)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sqlite/sqlite3.h"
+
 #include <algorithm>
 #include <cctype>
 #include <fstream>
@@ -9,7 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "../../libs/sqlite/sqlite3.h"
 
 struct UserData
 {

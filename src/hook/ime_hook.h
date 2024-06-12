@@ -1,6 +1,8 @@
 #pragma once
 
-#include <Windows.h>
+#include "sqlite/sqlite3.h"
+
+#include <windows.h>
 
 #include <cctype>
 #include <codecvt>
@@ -8,8 +10,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include "../../libs/sqlite/sqlite3.h"
 
 /*
     全局变量部分
@@ -26,7 +26,7 @@ extern int pageNo;
 // 左右引号的标志
 extern bool quoteFlag;
 // 数据库
-extern sqlite3* db;
+extern sqlite3 *db;
 
 // 整体输入法状态的一个控制
 // 默认是 0，也就是英文状态
@@ -37,8 +37,7 @@ extern std::string IMEStateToast;
 extern int CREATE_WORD_FLAG;
 // 造词需要用到的字符串
 extern std::vector<std::string> committedPinyin; // 拼音
-extern std::vector<std::string> committedChars; // 汉字
-
+extern std::vector<std::string> committedChars;  // 汉字
 
 // 转换字符串
 extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -49,4 +48,4 @@ extern std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 // 钩子处理函数
 LRESULT CALLBACK KBDHook(int nCode, WPARAM wParam, LPARAM lParam);
 // 模拟按下字符串中的每个字符
-void sendStringToCursor(const std::wstring& str);
+void sendStringToCursor(const std::wstring &str);
